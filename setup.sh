@@ -2,6 +2,7 @@
 
 # make sure we have git
 [[ $(command -v git) ]] && { install_bashit; } || { echo "git not installed."; }
+
 # TODO 
 # fix this case statement to handle Linux or Darwin
 # case foo in $(uname)
