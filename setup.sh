@@ -1,16 +1,29 @@
 #!/usr/bin/env bash
 
-# make sure we have git
-[[ $(command -v git) ]] && { install_bashit; } || { echo "git not installed."; }
+case $(uname) in 
+  Darwin)
+    xcode-select --install
+    install_homebrew
+    install_brew_apps
+    return
+    ;;
+  Linux)
+    sudo apt-get update
+    sudo apt-get install git
+    return
+    ;;
+  *)
+    echo "ERROR: uname reports this OS is not Darwin or Linux. Exiting."
+  ;;
+esac
 
-# TODO 
-# fix this case statement to handle Linux or Darwin
-# case foo in $(uname)
-#   "Darwin")
-#     install_homebrew
-#     install_brew_apps
-#   *)
-# fi
+
+# can't install bash-it without git
+if [[ $(git --version) ]]; then
+  install_bashit
+else
+  echo "git not found."
+fi
 
 
 install_bashit() 
@@ -22,10 +35,6 @@ install_bashit()
   fi
 }
 
-install_git()
-{
-  sudo apt-get update && sudo apt-get install git
-}
 
 install_homebrew()
 {
@@ -34,6 +43,7 @@ install_homebrew()
     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
   fi
 }
+
 
 install_brew_apps()
 {
