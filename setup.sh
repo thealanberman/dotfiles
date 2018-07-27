@@ -30,7 +30,7 @@ install_bashit()
 {
   read -e -s -p "Install Bash-it [y/N]? " -n 1 -r
   if [[ $REPLY =~ ^[Yy]$ ]]; then
-    /usr/bin/git clone --depth=1 https://github.com/Bash-it/bash-it.git ${HOME}/.bash-it
+    /usr/bin/git clone --depth=1 https://github.com/Bash-it/bash-it.git "${HOME}/.bash-it"
     eval "${HOME}/.bash-it/install.sh --silent --no-modify-config"
   fi
 }
