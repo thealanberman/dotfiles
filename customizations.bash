@@ -1,28 +1,38 @@
 #!/usr/bin/env bash
 
-[[ $(command -v code) ]] && \
-export EDITOR=$(command -v code) || \
-export EDITOR=$(command -v vim)
-SELF=$(basename "${BASH_SOURCE}")
+# --------------------------------- #
+# EDITOR
+# --------------------------------- #
+if [[ "$(command -v code)" ]]; then
+    EDITOR="$(command -v code)"
+elif [[ "$(command -v atom)" ]]; then
+    EDITOR="$(command -v atom)"
+else
+    EDITOR="$(command -v vim)"
+fi
+export EDITOR="${EDITOR}"
 
+
+# --------------------------------- #
 # ALIASES
-
+# --------------------------------- #
 alias l='ls -AGhlF'
 alias ll='l'
+SELF="$(basename "${BASH_SOURCE}")"
 alias aliases="${EDITOR} ${BASH_IT}/custom/${SELF}"
-alias customize='aliases'
-alias functions='aliases'
+alias sshconfig="${EDITOR} ${HOME}/.ssh/config"
 alias dev='cd ~/code'
 alias cd..='cd ..'
 alias df='df -H'
-alias sshconfig="${EDITOR} ${HOME}/.ssh/config"
-eval $(thefuck --alias)
+[[ "$(command -v thefuck)" ]] && { eval "$(thefuck --alias)"; }
 
+
+# --------------------------------- #
 # FUNCTIONS
-
+# --------------------------------- #
 dmg() {
     if [[ -d ${1} ]] && [[ -d ${2} ]]; then
-        VOL=$(basename "${1}")
+        VOL="$(basename "${1}")"
         hdiutil create -fs HFS+ -volname "${VOL}" -srcfolder "${1}" "${2}"/"${VOL}"
     else
         echo "Usage: dmg <source folder> <output folder>"
@@ -32,8 +42,7 @@ dmg() {
 
 ff() {
     if [[ -z "${1}" ]]; then
-        printf "Usage:\\n  Please specify a search term. use * for wildcards."
-        echo "Example: ff *.txt"
+        echo "Usage: ff <search term>"
     else
         find . -iname "${1}" 2>/dev/null
     fi
