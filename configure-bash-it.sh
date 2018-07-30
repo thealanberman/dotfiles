@@ -11,7 +11,7 @@ fi
 
 
 echo "Symlinking ${CWD}/*.bash to ${BASH_IT}/custom/ ..."
-ln -v -s ${CWD}/*.bash ${BASH_IT}/custom
+ln -v -s "${CWD}"/*.bash "${BASH_IT}"/custom
 
 echo "Enabling your aliases, plugins, and completions..."
 function enable() {
