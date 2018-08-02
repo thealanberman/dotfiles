@@ -5,13 +5,11 @@ case $(uname) in
     xcode-select --install
     install_homebrew
     install_brew_apps
-    setup_note
     return
     ;;
   Linux)
     sudo apt-get update
     sudo apt-get install git
-    setup_note
     return
     ;;
   *)
@@ -75,8 +73,4 @@ install_brew_apps()
     wget 
   fi
 }
-setup_note() {
-  local CWD
-  CWD="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-  [[ -f "${CWD}/note" ]] && { ln -s "${CWD}/note" /usr/local/bin/; }
-}
+
