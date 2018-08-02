@@ -24,9 +24,9 @@ alias sshconfig="${EDITOR} ${HOME}/.ssh/config"
 alias dev='cd ~/code'
 alias cd..='cd ..'
 alias df='df -H'
-alias now="$(date +%Y%m%dT%H%M)"
+alias now="echo $(date +%Y%m%dT%H%M)"
 alias timestamp="now"
-alias today=$(date +%Y%m%d)
+alias today="echo $(date +%Y%m%d)"
 
 [[ "$(command -v thefuck)" ]] && { eval "$(thefuck --alias)"; }
 
