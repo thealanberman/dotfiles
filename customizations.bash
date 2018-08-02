@@ -27,6 +27,8 @@ alias df='df -H'
 alias now="echo $(date +%Y%m%dT%H%M)"
 alias timestamp="now"
 alias today="echo $(date +%Y%m%d)"
+alias macdown="open -a MacDown"
+alias reload="source ${HOME}/.bash_profile"
 
 [[ "$(command -v thefuck)" ]] && { eval "$(thefuck --alias)"; }
 
