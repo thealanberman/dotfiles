@@ -10,7 +10,8 @@ create_note()
     if [ ! -f "${note_path}" ]; then
         mkdir -p "${HOME}/notes"
         touch "${note_path}"
-        printf "%s\\n--------\\n\\n" "${tstamp}" > "${note_path}"
+        printf "%s" "${tstamp}" > "${note_path}"
+        printf "\\n----------\\n\\n"
         printf "Created new note: %s\\n" "${note_path}"
     else
         printf "Note %s already exists.\\n" "${note_path}"
