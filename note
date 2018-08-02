@@ -33,7 +33,7 @@ print_help () {
 
 Arguments:
   -h | --help                         Display usage guide.
-  -e | --edit <DATE: year-month-day>  Open a specific note for editing.
+  -e | --edit <DATE>                  Open a specific note for editing.
   -p | --print                        Print the contents of a note.
   -c | --create                       Create a note but don't open it for editing.
   -i | --info                         Print information about a note.\\n"
