@@ -2,7 +2,7 @@
 # v3 Credit https://github.com/dcchambers/note-keeper
 # v4 2018.08.02
 
-today="$(date +%Y%m%d)"
+today="$(date +%Y-%m-%d)"
 note_path="${HOME}/notes/${today}.md"
 
 create_note() 
@@ -10,7 +10,7 @@ create_note()
     if [ ! -f "${note_path}" ]; then
         mkdir -p "${HOME}/notes"
         touch "${note_path}"
-        printf "%s\\n---\\n\\n" "${today}" > "${note_path}"
+        printf "%s\\n--------\\n\\n" "${today}" > "${note_path}"
         printf "Created new note: %s\\n" "${note_path}"
     else
         printf "Note %s already exists.\\n" "${note_path}"
