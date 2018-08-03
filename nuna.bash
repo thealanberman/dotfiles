@@ -90,58 +90,37 @@ chefnode() {
     popd >/dev/null
 }
 
+
 sandbox() {
-    [[ $(/usr/local/bin/aws sts get-caller-identity) ]] || {
-        echo "ERROR: 'mfa nuna' first."
-        return 1
-    }
     sandbox_name="${2:-${USER}}"
-    sandbox_instance_id="$(aws cloudformation describe-stack-resource --stack-name "CommercialSandboxStateless-${sandbox_name}" --logical-resource-id CommercialSandboxInstance --query 'StackResourceDetail.PhysicalResourceId' --output text)"
     ifconfig | grep -q 10.222 || { echo "No VPN connection."; return 1; } # VPN?
     case "${1}" in
-        status)
-            echo -n "Sandbox ${sandbox_name}.sandbox.int.nunahealth.com is: "
-            /usr/local/bin/aws ec2 describe-instance-status --instance-ids "${sandbox_instance_id}" --query "InstanceStatuses[0].InstanceState.Name" --output text
+        connect)
+            ping -q -t1 -c1 "${sandbox_name}.sandbox.int.nunahealth.com" || { return 1; }
+            ssh -A -o ConnectTimeout=1 "${sandbox_name}.sandbox.int.nunahealth.com" || \
+            { echo "ERROR: ssh-add?"; return 1; }
             ;;
         stop)
+            ping -q -t1 -c1 "${sandbox_name}.sandbox.int.nunahealth.com" || { return 1; }
+            sandbox_instance_id="$(aws cloudformation describe-stack-resource --stack-name "CommercialSandboxStateless-${sandbox_name}" --logical-resource-id CommercialSandboxInstance --query 'StackResourceDetail.PhysicalResourceId' --output text)"
             echo "Stopping Sandbox ${sandbox_name}.sandbox.int.nunahealth.com..."
             /usr/local/bin/aws ec2 stop-instances --instance-ids "${sandbox_instance_id}"
             /usr/local/bin/aws ec2 wait instance-stopped --instance-ids "${sandbox_instance_id}" &&
                 echo "Sandbox is now stopped."
             ;;
         start)
+            sandbox_instance_id="$(aws cloudformation describe-stack-resource --stack-name "CommercialSandboxStateless-${sandbox_name}" --logical-resource-id CommercialSandboxInstance --query 'StackResourceDetail.PhysicalResourceId' --output text)"
             /usr/local/bin/aws ec2 start-instances --instance-ids "${sandbox_instance_id}" &&
                 echo "Waiting for Sandbox ${sandbox_name}.sandbox.int.nunahealth.com to start..."
             /usr/local/bin/aws ec2 wait instance-running --instance-ids "${sandbox_instance_id}" &&
                 echo "Sandbox is now running."
             ;;
-        connect)
-            ssh -A -o ConnectTimeout=1 "${sandbox_name}.sandbox.int.nunahealth.com" ||
-                echo "ERROR: Check VPN connection? ssh-add?"
-            ;;
-        mount)
-            command -v sshfs 1>/dev/null || { echo -e "SSHFS not found.\\n\\n  brew install sshfs\\n"; return 1; } # check for sshfs
-            mkdir -p ~/sandbox ~/sandbox-src
-            if ! mount | grep -q sandbox; then # sandbox mounted?
-                sshfs -o auto_cache,reconnect,defer_permissions,noappledouble \
-                    "${sandbox_name}.sandbox.int.nunahealth.com:/home/${sandbox_name}" "/Users/${USER}/sandbox"
-                sshfs -o auto_cache,reconnect,defer_permissions,noappledouble\
-                    "${sandbox_name}.sandbox.int.nunahealth.com:/data/src" "/Users/${USER}/sandbox-src"
-                echo "Mounted at ~/sandbox and ~/sandbox-src"
-            else
-                echo "A sandbox is already mounted!"
-                mount | grep sandbox
-            fi
-            ;;
-        unmount)
-            umount ~/sandbox ~/sandbox-src && echo "Unmounted ~/sandbox and ~/sandbox-src"
-            ;;
         *)
             echo "USAGE:"
-            echo "  sandbox <status|start|connect|stop|mount|unmount> [username]"
-            echo "  Default username: ${USER}"
+            echo "  sandbox <start | stop | connect> [username]"
+            echo "  default username: ${USER}"
             ;;
-    esac
+    esac || { echo "ERROR: 'mfa nuna' first?"; }
 }
 
 bootstrapper() {
