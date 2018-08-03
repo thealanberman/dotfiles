@@ -56,7 +56,7 @@ cg() {
     # Shorthand for chef generate.
     FIRST="${1}"
     shift
-    THEREST="${@}"
+    THEREST="${*}"
     chef generate "${FIRST}" -g "${CHEF_ROOT}/customizations/stove/" "${CHEF_ROOT}/cookbooks/${THEREST}"
 }
 
@@ -129,7 +129,7 @@ bootstrapper() {
 
 ssh-add() {
     if [ -n "$1" ]; then
-        command ssh-add "${@}"
+        command ssh-add "${*}"
     else
         command ssh-add -e /usr/local/lib/opensc-pkcs11.so >/dev/null 2>&1
         command ssh-add -s /usr/local/lib/opensc-pkcs11.so
@@ -141,10 +141,10 @@ ssh-yubikey-pub() {
 }
 
 aws() {
-    if [[ "${@}" =~ ^(s3 cp|s3 sync)[[:space:]] ]]; then
-        /usr/local/bin/aws "${@}" --sse
+    if [[ "${*}" =~ ^(s3 cp|s3 sync)[[:space:]] ]]; then
+        /usr/local/bin/aws "${*}" --sse
     else
-        /usr/local/bin/aws "${@}"
+        /usr/local/bin/aws "${*}"
     fi
 }
 
