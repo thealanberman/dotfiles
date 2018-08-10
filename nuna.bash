@@ -15,7 +15,7 @@ alias repo="cd \${CHEF_ROOT}"
 alias deployments="cd ${NUNA_ROOT}/configs/nunahealth/aws/cloudformation/deployments"
 alias chefshell="chef-apply -e 'require \"pry\"; binding.pry'"
 alias dev="cd ${HOME}/code"
-alias changepw="${HOME}/changepw/changepw.py"
+alias changepw="${HOME}/code/changepw/changepw.py"
 alias bastion="${HOME}/code/it-bastion-ssh-server/bastion.sh"
 alias markdown="rsync -Phavz ${HOME}/Documents/markdown /keybase/private/thealanberman/"
 
@@ -93,35 +93,70 @@ chefnode() {
 
 sandbox() {
     sandbox_name="${2:-${USER}}"
-    ifconfig | grep -q 10.222 || { echo "No VPN connection."; return 1; } # VPN?
     case "${1}" in
-        connect)
-            ping -q -t1 -c1 "${sandbox_name}.sandbox.int.nunahealth.com" || { return 1; }
-            ssh -A -o ConnectTimeout=1 "${sandbox_name}.sandbox.int.nunahealth.com" || \
-            { echo "ERROR: ssh-add?"; return 1; }
+        status)
+            [[ "$(/usr/local/bin/aws sts get-caller-identity)" ]] || { echo "ERROR: 'aws-mfa' first!"; return 1; }
+            sandbox_instance_id="$(aws cloudformation describe-stack-resource --stack-name CommercialSandboxStateless-${sandbox_name} --logical-resource-id CommercialSandboxInstance --query 'StackResourceDetail.PhysicalResourceId' --output text)"
+            echo -n "Sandbox ${sandbox_name}.sandbox.int.nunahealth.com is: "
+            /usr/local/bin/aws ec2 describe-instance-status --instance-ids "${sandbox_instance_id}" --query "InstanceStatuses[0].InstanceState.Name" --output text
             ;;
         stop)
-            ping -q -t1 -c1 "${sandbox_name}.sandbox.int.nunahealth.com" || { return 1; }
-            sandbox_instance_id="$(aws cloudformation describe-stack-resource --stack-name "CommercialSandboxStateless-${sandbox_name}" --logical-resource-id CommercialSandboxInstance --query 'StackResourceDetail.PhysicalResourceId' --output text)"
+            [[ "$(/usr/local/bin/aws sts get-caller-identity)" ]] || { echo "ERROR: 'aws-mfa' first!"; return 1; }
             echo "Stopping Sandbox ${sandbox_name}.sandbox.int.nunahealth.com..."
             /usr/local/bin/aws ec2 stop-instances --instance-ids "${sandbox_instance_id}"
-            /usr/local/bin/aws ec2 wait instance-stopped --instance-ids "${sandbox_instance_id}" &&
-                echo "Sandbox is now stopped."
+            /usr/local/bin/aws ec2 wait instance-stopped --instance-ids "${sandbox_instance_id}" && \
+            echo "Sandbox is now stopped."
             ;;
         start)
-            sandbox_instance_id="$(aws cloudformation describe-stack-resource --stack-name "CommercialSandboxStateless-${sandbox_name}" --logical-resource-id CommercialSandboxInstance --query 'StackResourceDetail.PhysicalResourceId' --output text)"
-            /usr/local/bin/aws ec2 start-instances --instance-ids "${sandbox_instance_id}" &&
-                echo "Waiting for Sandbox ${sandbox_name}.sandbox.int.nunahealth.com to start..."
-            /usr/local/bin/aws ec2 wait instance-running --instance-ids "${sandbox_instance_id}" &&
-                echo "Sandbox is now running."
+            [[ "$(/usr/local/bin/aws sts get-caller-identity)" ]] || { echo "ERROR: 'aws-mfa' first!"; return 1; }
+            /usr/local/bin/aws ec2 start-instances --instance-ids "${sandbox_instance_id}" && \
+            echo "Waiting for Sandbox ${sandbox_name}.sandbox.int.nunahealth.com to start..."
+            /usr/local/bin/aws ec2 wait instance-running --instance-ids "${sandbox_instance_id}" && \
+            echo "Sandbox is now running."
+            ;;
+        connect)
+            ssh -A -o ConnectTimeout=1 "${sandbox_name}.sandbox.int.nunahealth.com" || \
+            echo "ERROR: Check VPN connection?"
             ;;
         *)
             echo "USAGE:"
-            echo "  sandbox <start | stop | connect> [username]"
-            echo "  default username: ${USER}"
+            echo "  sandbox <status|start|connect|stop> [username]"
+            echo "  Default username: ${USER}"
             ;;
-    esac || { echo "ERROR: 'mfa nuna' first?"; }
+    esac
 }
+
+# sandbox() {
+#     sandbox_name="${2:-${USER}}"
+#     ifconfig | grep -q 10.222 || { echo "No VPN connection."; return 1; } # VPN?
+#     case "${1}" in
+#         connect)
+#             ping -q -t1 -c1 "${sandbox_name}.sandbox.int.nunahealth.com" || { return 1; }
+#             ssh -A -o ConnectTimeout=1 "${sandbox_name}.sandbox.int.nunahealth.com" || \
+#             { echo "ERROR: ssh-add?"; return 1; }
+#             ;;
+#         stop)
+#             ping -q -t1 -c1 "${sandbox_name}.sandbox.int.nunahealth.com" || { return 1; }
+#             sandbox_instance_id="$(aws cloudformation describe-stack-resource --stack-name "CommercialSandboxStateless-${sandbox_name}" --logical-resource-id CommercialSandboxInstance --query 'StackResourceDetail.PhysicalResourceId' --output text)"
+#             echo "Stopping Sandbox ${sandbox_name}.sandbox.int.nunahealth.com..."
+#             /usr/local/bin/aws ec2 stop-instances --instance-ids "${sandbox_instance_id}"
+#             /usr/local/bin/aws ec2 wait instance-stopped --instance-ids "${sandbox_instance_id}" &&
+#                 echo "Sandbox is now stopped."
+#             ;;
+#         start)
+#             sandbox_instance_id="$(aws cloudformation describe-stack-resource --stack-name "CommercialSandboxStateless-${sandbox_name}" --logical-resource-id CommercialSandboxInstance --query 'StackResourceDetail.PhysicalResourceId' --output text)"
+#             /usr/local/bin/aws ec2 start-instances --instance-ids "${sandbox_instance_id}" &&
+#                 echo "Waiting for Sandbox ${sandbox_name}.sandbox.int.nunahealth.com to start..."
+#             /usr/local/bin/aws ec2 wait instance-running --instance-ids "${sandbox_instance_id}" &&
+#                 echo "Sandbox is now running."
+#             ;;
+#         *)
+#             echo "USAGE:"
+#             echo "  sandbox <start | stop | connect> [username]"
+#             echo "  default username: ${USER}"
+#             ;;
+#     esac || { echo "ERROR: 'mfa nuna' first?"; }
+# }
 
 bootstrapper() {
     source "${CHEF_ROOT}/customizations/scripts/bootstrapper.sh"
