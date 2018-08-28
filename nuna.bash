@@ -96,7 +96,7 @@ sandbox() {
     case "${1}" in
         status)
             [[ "$(/usr/local/bin/aws sts get-caller-identity)" ]] || { echo "ERROR: 'aws-mfa' first!"; return 1; }
-            sandbox_instance_id="$(aws cloudformation describe-stack-resource --stack-name CommercialSandboxStateless-${sandbox_name} --logical-resource-id CommercialSandboxInstance --query 'StackResourceDetail.PhysicalResourceId' --output text)"
+            sandbox_instance_id="$(/usr/local/bin/aws cloudformation describe-stack-resource --stack-name CommercialSandboxStateless-"${sandbox_name}" --logical-resource-id CommercialSandboxInstance --query 'StackResourceDetail.PhysicalResourceId' --output text)"
             echo -n "Sandbox ${sandbox_name}.sandbox.int.nunahealth.com is: "
             /usr/local/bin/aws ec2 describe-instance-status --instance-ids "${sandbox_instance_id}" --query "InstanceStatuses[0].InstanceState.Name" --output text
             ;;
@@ -176,22 +176,36 @@ ssh-yubikey-pub() {
 }
 
 aws() {
-    if [[ "${*}" =~ ^(s3 cp|s3 sync)[[:space:]] ]]; then
-        /usr/local/bin/aws "${*}" --sse
+    if [[ "$*" =~ ^(s3 cp|s3 sync)[[:space:]] ]]; then
+        /usr/local/bin/aws "$*" --sse
     else
-        /usr/local/bin/aws "${*}"
+        /usr/local/bin/aws "$*"
     fi
 }
+
+
+instance() {
+    case "${1}" in
+        search)
+            /usr/local/bin/awless list instances --filter name="${2}"
+            ;;
+        *)
+            echo "USAGE:"
+            echo "  instance search <name or partial name>"
+            ;;
+    esac
+}
+
 
 stack() {
     case "${1}" in
         delete)
-            aws cloudformation delete-stack --stack-name "${2}"
+            /usr/local/bin/aws cloudformation delete-stack --stack-name "${2}"
             echo "Waiting for confirmation..."
-            aws cloudformation wait stack-delete-complete --stack-name "${2}" && echo "${2} Deleted."
+            /usr/local/bin/aws cloudformation wait stack-delete-complete --stack-name "${2}" && echo "${2} Deleted."
             ;;
         search)
-            aws cloudformation describe-stacks --query "Stacks[?StackName!='null']|[?contains(StackName,\`$2\`)==\`true\`].StackName" "${@:3}"
+            /usr/local/bin/aws cloudformation describe-stacks --query "Stacks[?StackName!='null']|[?contains(StackName,\`$2\`)==\`true\`].StackName" "${@:3}" --output table
             ;;
         *)
             echo "USAGE:"
