@@ -26,19 +26,16 @@ mfa() {
             return
             ;;
         nuna)
-            export AWS_PROFILE='default'
+            # export AWS_PROFILE='default'
+            "${HOME}"/vault-auth-aws-beta.py
+            return
             ;;
         experimental)
             export AWS_PROFILE='nuna-experimental'
             ;;
-        tmsis)
-            export AWS_PROFILE='tmsis'
-            ;;
-        macbisdw)
-            export AWS_PROFILE='macbisdw'
-            ;;
         *)
-            echo "usage: mfa <check|nuna|experimental|tmsis|macbisdw>"
+            echo "usage: mfa <check|nuna|experimental>"
+            return
             ;;
     esac
     PIPENV_PIPFILE="${HOME}/aws-mfa/Pipfile" pipenv run aws-mfa
@@ -174,15 +171,6 @@ ssh-add() {
 ssh-yubikey-pub() {
     ssh-keygen -D /usr/local/lib/opensc-pkcs11.so -e
 }
-
-aws() {
-    if [[ "$*" =~ ^(s3 cp|s3 sync)[[:space:]] ]]; then
-        /usr/local/bin/aws "$*" --sse
-    else
-        /usr/local/bin/aws "$*"
-    fi
-}
-
 
 instance() {
     case "${1}" in
