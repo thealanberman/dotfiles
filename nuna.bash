@@ -12,34 +12,12 @@ export ADMIN_USERNAME='alan-admin'
 
 alias nuna="/usr/local/bin/code \${BASH_IT}/custom/nuna.bash"
 alias repo="cd \${CHEF_ROOT}"
-alias deployments="cd ${NUNA_ROOT}/configs/nunahealth/aws/cloudformation/deployments"
+alias deployments="cd \${NUNA_ROOT}/configs/nunahealth/aws/cloudformation/deployments"
 alias chefshell="chef-apply -e 'require \"pry\"; binding.pry'"
-alias dev="cd ${HOME}/code"
-alias changepw="${HOME}/code/changepw/changepw.py"
-alias bastion="${HOME}/code/it-bastion-ssh-server/bastion.sh"
-alias markdown="rsync -Phavz ${HOME}/Documents/markdown /keybase/private/thealanberman/"
-
-mfa() {
-    case "${1}" in
-        check)
-            aws sts get-caller-identity
-            return
-            ;;
-        nuna)
-            # export AWS_PROFILE='default'
-            "${HOME}"/vault-auth-aws-beta.py
-            return
-            ;;
-        experimental)
-            export AWS_PROFILE='nuna-experimental'
-            ;;
-        *)
-            echo "usage: mfa <check|nuna|experimental>"
-            return
-            ;;
-    esac
-    PIPENV_PIPFILE="${HOME}/aws-mfa/Pipfile" pipenv run aws-mfa
-}
+alias dev="cd \${HOME}/code"
+alias changepw="\${HOME}/code/changepw/changepw.py"
+alias bastion="\${HOME}/code/it-bastion-ssh-server/bastion.sh"
+alias markdown="rsync -Phavz \${HOME}/Documents/markdown /keybase/private/thealanberman/"
 
 get-ami-id() {
     [[ -z ${1} ]] && {
@@ -123,38 +101,6 @@ sandbox() {
     esac
 }
 
-# sandbox() {
-#     sandbox_name="${2:-${USER}}"
-#     ifconfig | grep -q 10.222 || { echo "No VPN connection."; return 1; } # VPN?
-#     case "${1}" in
-#         connect)
-#             ping -q -t1 -c1 "${sandbox_name}.sandbox.int.nunahealth.com" || { return 1; }
-#             ssh -A -o ConnectTimeout=1 "${sandbox_name}.sandbox.int.nunahealth.com" || \
-#             { echo "ERROR: ssh-add?"; return 1; }
-#             ;;
-#         stop)
-#             ping -q -t1 -c1 "${sandbox_name}.sandbox.int.nunahealth.com" || { return 1; }
-#             sandbox_instance_id="$(aws cloudformation describe-stack-resource --stack-name "CommercialSandboxStateless-${sandbox_name}" --logical-resource-id CommercialSandboxInstance --query 'StackResourceDetail.PhysicalResourceId' --output text)"
-#             echo "Stopping Sandbox ${sandbox_name}.sandbox.int.nunahealth.com..."
-#             /usr/local/bin/aws ec2 stop-instances --instance-ids "${sandbox_instance_id}"
-#             /usr/local/bin/aws ec2 wait instance-stopped --instance-ids "${sandbox_instance_id}" &&
-#                 echo "Sandbox is now stopped."
-#             ;;
-#         start)
-#             sandbox_instance_id="$(aws cloudformation describe-stack-resource --stack-name "CommercialSandboxStateless-${sandbox_name}" --logical-resource-id CommercialSandboxInstance --query 'StackResourceDetail.PhysicalResourceId' --output text)"
-#             /usr/local/bin/aws ec2 start-instances --instance-ids "${sandbox_instance_id}" &&
-#                 echo "Waiting for Sandbox ${sandbox_name}.sandbox.int.nunahealth.com to start..."
-#             /usr/local/bin/aws ec2 wait instance-running --instance-ids "${sandbox_instance_id}" &&
-#                 echo "Sandbox is now running."
-#             ;;
-#         *)
-#             echo "USAGE:"
-#             echo "  sandbox <start | stop | connect> [username]"
-#             echo "  default username: ${USER}"
-#             ;;
-#     esac || { echo "ERROR: 'mfa nuna' first?"; }
-# }
-
 bootstrapper() {
     source "${CHEF_ROOT}/customizations/scripts/bootstrapper.sh"
 }
@@ -184,8 +130,13 @@ instance() {
     esac
 }
 
-
 stack() {
+    stackhelp() {
+            echo "USAGE:"
+            echo "  stack search <search term>"
+            echo "  stack delete <stack name>"
+    }
+    [ -z $2 ] && { stackhelp; return 1; }
     case "${1}" in
         delete)
             /usr/local/bin/aws cloudformation delete-stack --stack-name "${2}"
@@ -196,9 +147,7 @@ stack() {
             /usr/local/bin/aws cloudformation describe-stacks --query "Stacks[?StackName!='null']|[?contains(StackName,\`$2\`)==\`true\`].StackName" "${@:3}" --output table
             ;;
         *)
-            echo "USAGE:"
-            echo "  stack search <search term>"
-            echo "  stack delete <stack name>"
+            stackhelp
             ;;
     esac
 }
