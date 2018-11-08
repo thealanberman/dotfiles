@@ -18,13 +18,15 @@ alias dev="cd \${HOME}/code"
 alias changepw="\${HOME}/code/changepw/changepw.py"
 alias bastion="\${HOME}/code/it-bastion-ssh-server/bastion.sh"
 alias markdown="rsync -Phavz \${HOME}/Documents/markdown /keybase/private/thealanberman/"
+alias mfa="/usr/local/bin/vault-auth-aws.sh"
+alias auth="/usr/local/bin/vault-auth-aws.sh"
 
 get-ami-id() {
     [[ -z ${1} ]] && {
         echo "Usage: get-ami-id <ASG stack_name>"
         return
     }
-    /usr/local/bin/aws cloudformation describe-stacks --stack-name "${1}" --query "Stacks[0].Parameters[?ParameterKey=='ImageId'].ParameterValue" --output text
+    aws cloudformation describe-stacks --stack-name "${1}" --query "Stacks[0].Parameters[?ParameterKey=='ImageId'].ParameterValue" --output text
 }
 
 cg() {
@@ -70,23 +72,24 @@ sandbox() {
     sandbox_name="${2:-${USER}}"
     case "${1}" in
         status)
-            [[ "$(/usr/local/bin/aws sts get-caller-identity)" ]] || { echo "ERROR: 'aws-mfa' first!"; return 1; }
-            sandbox_instance_id="$(/usr/local/bin/aws cloudformation describe-stack-resource --stack-name CommercialSandboxStateless-"${sandbox_name}" --logical-resource-id CommercialSandboxInstance --query 'StackResourceDetail.PhysicalResourceId' --output text)"
+            [[ "$(aws sts get-caller-identity)" ]] || { echo "ERROR: 'aws-mfa' first!"; return 1; }
+            sandbox_instance_id="$(aws cloudformation describe-stack-resource --stack-name CommercialSandboxStateless-"${sandbox_name}" --logical-resource-id CommercialSandboxInstance --query 'StackResourceDetail.PhysicalResourceId' --output text)"
             echo -n "Sandbox ${sandbox_name}.sandbox.int.nunahealth.com is: "
-            /usr/local/bin/aws ec2 describe-instance-status --instance-ids "${sandbox_instance_id}" --query "InstanceStatuses[0].InstanceState.Name" --output text
+            aws ec2 describe-instance-status --instance-ids "${sandbox_instance_id}" --query "InstanceStatuses[0].InstanceState.Name" --output text
             ;;
         stop)
-            [[ "$(/usr/local/bin/aws sts get-caller-identity)" ]] || { echo "ERROR: 'aws-mfa' first!"; return 1; }
+            [[ "$(aws sts get-caller-identity)" ]] || { echo "ERROR: 'aws-mfa' first!"; return 1; }
             echo "Stopping Sandbox ${sandbox_name}.sandbox.int.nunahealth.com..."
-            /usr/local/bin/aws ec2 stop-instances --instance-ids "${sandbox_instance_id}"
-            /usr/local/bin/aws ec2 wait instance-stopped --instance-ids "${sandbox_instance_id}" && \
+            aws ec2 stop-instances --instance-ids "${sandbox_instance_id}"
+            aws ec2 wait instance-stopped --instance-ids "${sandbox_instance_id}" && \
             echo "Sandbox is now stopped."
             ;;
         start)
-            [[ "$(/usr/local/bin/aws sts get-caller-identity)" ]] || { echo "ERROR: 'aws-mfa' first!"; return 1; }
-            /usr/local/bin/aws ec2 start-instances --instance-ids "${sandbox_instance_id}" && \
+            aws sts get-caller-identity || { echo "ERROR: 'mfa' first!"; return 1; }
+            sandbox_instance_id="$(aws cloudformation describe-stack-resource --stack-name CommercialSandboxStateless-"${sandbox_name}" --logical-resource-id CommercialSandboxInstance --query 'StackResourceDetail.PhysicalResourceId' --output text)"
+            aws ec2 start-instances --instance-ids "${sandbox_instance_id}" && \
             echo "Waiting for Sandbox ${sandbox_name}.sandbox.int.nunahealth.com to start..."
-            /usr/local/bin/aws ec2 wait instance-running --instance-ids "${sandbox_instance_id}" && \
+            aws ec2 wait instance-running --instance-ids "${sandbox_instance_id}" && \
             echo "Sandbox is now running."
             ;;
         connect)
@@ -139,15 +142,21 @@ stack() {
     [ -z $2 ] && { stackhelp; return 1; }
     case "${1}" in
         delete)
-            /usr/local/bin/aws cloudformation delete-stack --stack-name "${2}"
+            aws cloudformation delete-stack --stack-name "${2}"
             echo "Waiting for confirmation..."
-            /usr/local/bin/aws cloudformation wait stack-delete-complete --stack-name "${2}" && echo "${2} Deleted."
+            aws cloudformation wait stack-delete-complete --stack-name "${2}" && echo "${2} Deleted."
             ;;
         search)
-            /usr/local/bin/aws cloudformation describe-stacks --query "Stacks[?StackName!='null']|[?contains(StackName,\`$2\`)==\`true\`].StackName" "${@:3}" --output table
+            aws cloudformation describe-stacks \
+            --query "Stacks[?StackName!='null']|[?contains(StackName,\`$2\`)==\`true\`].StackName" "${@:3}" \
+            --output table
             ;;
         *)
             stackhelp
             ;;
     esac
+}
+
+newscript() {
+    curl -s http://bash3boilerplate.sh/main.sh > "${1:-main.sh}" && echo "${1:-main.sh} created."
 }
