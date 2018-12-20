@@ -3,12 +3,17 @@
 # export PYENV_ROOT="${HOME}/.pyenv"  
 # eval "$(pyenv init -)"
 # eval "$(pyenv virtualenv-init -)"
-eval "$(pipenv --completion)"
+# eval "$(pipenv --completion)"
+if [ -f $(brew --prefix)/opt/mcfly/mcfly.bash ]; then
+  . $(brew --prefix)/opt/mcfly/mcfly.bash
+fi
 export MFA_STS_DURATION=53200
 export NUNA_ROOT="${HOME}/code/analytics"
 export CHEF_ROOT="${HOME}/code/chef-repo"
 export SSH_ENV="${HOME}/.ssh/environment"
 export ADMIN_USERNAME='alan-admin'
+export VAULT_ADDR="https://vault.int.nunahealth.com"
+export GOPATH="${HOME}/code/go"
 
 alias nuna="/usr/local/bin/code \${BASH_IT}/custom/nuna.bash"
 alias repo="cd \${CHEF_ROOT}"
