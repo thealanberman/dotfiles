@@ -131,3 +131,15 @@ get_serial ()
 {
     system_profiler SPHardwareDataType | awk -F" " '/Serial/ {print $4}'
 }
+
+json2yaml ()
+{
+    ruby -ryaml -rjson -e 'puts YAML.dump(JSON.parse(STDIN.read))' < "${1}" > "${1}.yaml"
+    echo "Created ${1}.yaml"
+}
+
+yaml2json ()
+{
+    ruby -ryaml -rjson -e 'puts JSON.pretty_generate(YAML.load(ARGF))' < "${1}" > "${1}.json"
+    echo "Created ${1}.json"
+}

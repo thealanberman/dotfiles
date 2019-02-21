@@ -14,17 +14,17 @@ export SSH_ENV="${HOME}/.ssh/environment"
 export ADMIN_USERNAME='alan-admin'
 export VAULT_ADDR="https://vault.int.nunahealth.com"
 export GOPATH="${HOME}/code/go"
+export CDPATH=:..:~:${NUNA_ROOT}/configs/nunahealth/aws/cloudformation
 
 alias nuna="/usr/local/bin/code \${BASH_IT}/custom/nuna.bash"
 alias repo="cd \${CHEF_ROOT}"
+alias analytics="cd \${NUNA_ROOT}/configs/nunahealth/aws"
 alias deployments="cd \${NUNA_ROOT}/configs/nunahealth/aws/cloudformation/deployments"
 alias chefshell="chef-apply -e 'require \"pry\"; binding.pry'"
-alias dev="cd \${HOME}/code"
 alias changepw="\${HOME}/code/changepw/changepw.py"
 alias bastion="\${HOME}/code/it-bastion-ssh-server/bastion.sh"
-alias markdown="rsync -Phavz \${HOME}/Documents/markdown /keybase/private/thealanberman/"
 alias mfa="/usr/local/bin/vault-auth-aws.sh"
-alias auth="/usr/local/bin/vault-auth-aws.sh"
+alias auth="mfa"
 
 get-ami-id() {
     [[ -z ${1} ]] && {
@@ -74,23 +74,26 @@ chefnode() {
 
 
 sandbox() {
+    sandbox_help() {
+            echo "USAGE:"
+            echo "  sandbox <status|start|connect|stop> [username]"
+            echo "  Default username: ${USER}"
+    }
     sandbox_name="${2:-${USER}}"
+    aws sts get-caller-identity > /dev/null 2>&1 || { echo "ERROR: 'mfa' first!"; return 1; }
     case "${1}" in
         status)
-            [[ "$(aws sts get-caller-identity)" ]] || { echo "ERROR: 'aws-mfa' first!"; return 1; }
             sandbox_instance_id="$(aws cloudformation describe-stack-resource --stack-name CommercialSandboxStateless-"${sandbox_name}" --logical-resource-id CommercialSandboxInstance --query 'StackResourceDetail.PhysicalResourceId' --output text)"
             echo -n "Sandbox ${sandbox_name}.sandbox.int.nunahealth.com is: "
             aws ec2 describe-instance-status --instance-ids "${sandbox_instance_id}" --query "InstanceStatuses[0].InstanceState.Name" --output text
             ;;
         stop)
-            [[ "$(aws sts get-caller-identity)" ]] || { echo "ERROR: 'aws-mfa' first!"; return 1; }
             echo "Stopping Sandbox ${sandbox_name}.sandbox.int.nunahealth.com..."
             aws ec2 stop-instances --instance-ids "${sandbox_instance_id}"
             aws ec2 wait instance-stopped --instance-ids "${sandbox_instance_id}" && \
             echo "Sandbox is now stopped."
             ;;
         start)
-            aws sts get-caller-identity || { echo "ERROR: 'mfa' first!"; return 1; }
             sandbox_instance_id="$(aws cloudformation describe-stack-resource --stack-name CommercialSandboxStateless-"${sandbox_name}" --logical-resource-id CommercialSandboxInstance --query 'StackResourceDetail.PhysicalResourceId' --output text)"
             aws ec2 start-instances --instance-ids "${sandbox_instance_id}" && \
             echo "Waiting for Sandbox ${sandbox_name}.sandbox.int.nunahealth.com to start..."
@@ -102,9 +105,7 @@ sandbox() {
             echo "ERROR: Check VPN connection?"
             ;;
         *)
-            echo "USAGE:"
-            echo "  sandbox <status|start|connect|stop> [username]"
-            echo "  Default username: ${USER}"
+            sandbox_help
             ;;
     esac
 }
@@ -144,7 +145,7 @@ stack() {
             echo "  stack search <search term>"
             echo "  stack delete <stack name>"
     }
-    [ -z $2 ] && { stackhelp; return 1; }
+    [ -z "${2}" ] && { stackhelp; return 1; }
     case "${1}" in
         delete)
             aws cloudformation delete-stack --stack-name "${2}"
@@ -164,4 +165,23 @@ stack() {
 
 newscript() {
     curl -s http://bash3boilerplate.sh/main.sh > "${1:-main.sh}" && echo "${1:-main.sh} created."
+}
+
+initlog() {
+    [[ -z "${1}" ]] && { \
+        printf "ABOUT\n\tDisplays the latest cloud init log for a service + tier.\nUSAGE\n\tinitlog <service> <tier>\n"
+        return 1
+        }
+    local latestlog
+    latestlog=$(aws s3 ls "s3://nunahealth-conf/status/${1}/${2}/" | tail -n1 | awk '{print $4}')
+    [[ "${3}" == "cat" ]] && \
+    aws s3 cp "s3://nunahealth-conf/status/${1}/${2}/${latestlog}" - | cat || \
+    aws s3 cp "s3://nunahealth-conf/status/${1}/${2}/${latestlog}" - | bat
+}
+
+# Called as `prompw prod` this fetches the prod password from vault and puts it in your Mac's clipboard
+prompw () {
+    aws sts get-caller-identity > /dev/null 2>&1 || { echo "ERROR: 'vault-auth-aws.sh' first!"; return 1; }
+    [[ "${1}" == "dev" || "${1}" == "prod" ]] || { echo "ERROR: must specify 'dev' or 'prod'"; return 1; }
+    vault read -field=value "nuna/${1}/prometheus/http/password" | pbcopy && echo "clipboarded"
 }
