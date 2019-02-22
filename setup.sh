@@ -11,6 +11,9 @@ set -o pipefail
 # Turn on traces, useful while debugging
 set -o xtrace # set -x
 
+# get current working directory
+CWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 append_inputrc()
 {
   if ! grep "completion-ignore-case" ~/.inputrc &> /dev/null; then
@@ -23,7 +26,7 @@ configure_vim()
   mkdir -p ~/.vim/pack/default/start
   git clone https://github.com/morhetz/gruvbox.git ~/.vim/pack/default/start/gruvbox
   git clone https://github.com/sheerun/vim-polyglot ~/.vim/pack/default/start/vim-polyglot
-  ln -s .vimrc ~/.vimrc
+  ln -s "${CWD}"/.vimrc ~/.vimrc
 }
 
 install_bashit() 
@@ -31,16 +34,16 @@ install_bashit()
   # can't install bash-it without git
   git --version || return 
   read -e -s -p "Install Bash-it [y/N]? " -n 1 -r
-  if [[ $REPLY =~ ^[Yy]$ ]]; then
-    /usr/bin/git clone --depth=1 https://github.com/Bash-it/bash-it.git "${HOME}/.bash-it"
-    eval "${HOME}/.bash-it/install.sh --silent --no-modify-config"
+  if [[ "${REPLY}" =~ ^[Yy]$ ]]; then
+    /usr/bin/git clone --depth=1 https://github.com/Bash-it/bash-it.git ~/.bash-it
+    eval ~/.bash-it/install.sh --silent --no-modify-config
   fi
 }
 
 install_homebrew()
 {
   read -e -s -p "Install Homebrew [y/N]? " -n 1 -r
-  if [[ $REPLY =~ ^[Yy]$ ]]; then
+  if [[ "${REPLY}" =~ ^[Yy]$ ]]; then
     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
   fi
 }
@@ -48,7 +51,7 @@ install_homebrew()
 install_brew_apps()
 {
   read -e -s -p "Install Homebrew apps [y/N]? " -n 1 -r
-  if [[ $REPLY =~ ^[Yy]$ ]]; then
+  if [[ "${REPLY}" =~ ^[Yy]$ ]]; then
     brew install \
     awless \
     awscli \
