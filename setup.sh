@@ -7,14 +7,12 @@ case $(uname) in
     xcode-select --install
     install_homebrew
     install_brew_apps
-    return
     ;;
   Linux)
     append_inputrc
     configure_vim
     sudo apt-get update
     sudo apt-get install git
-    return
     ;;
   *)
     echo "ERROR: uname reports this OS is not Darwin or Linux. Exiting."
