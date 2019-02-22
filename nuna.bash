@@ -132,7 +132,7 @@ instance() {
             printf "USAGE:\n\t"
             printf "instance search <name or partial name>\n\t"
             printf "instance ssh <name or private IP>\n\t"
-            printf "instance ssh <service> <tier>"
+            printf "instance ssh <service> <tier>\n"
             ;;
     esac
 }
