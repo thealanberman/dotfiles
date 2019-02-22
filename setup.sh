@@ -11,27 +11,6 @@ set -o pipefail
 # Turn on traces, useful while debugging
 set -o xtrace # set -x
 
-case $(uname) in 
-  Darwin)
-    append_inputrc
-    xcode-select --install
-    install_homebrew
-    install_brew_apps
-    install_bashit
-    configure_vim
-    ;;
-  Linux)
-    append_inputrc
-    sudo apt-get update
-    sudo apt-get install git
-    install_bashit
-    configure_vim
-    ;;
-  *)
-    echo "ERROR: uname reports this OS is not Darwin or Linux. Exiting."
-  ;;
-esac
-
 append_inputrc()
 {
   if ! grep "completion-ignore-case" ~/.inputrc &> /dev/null; then
@@ -95,3 +74,23 @@ install_brew_apps()
   fi
 }
 
+case $(uname) in 
+  Darwin)
+    append_inputrc
+    xcode-select --install
+    install_homebrew
+    install_brew_apps
+    install_bashit
+    configure_vim
+    ;;
+  Linux)
+    append_inputrc
+    sudo apt-get update
+    sudo apt-get install git
+    install_bashit
+    configure_vim
+    ;;
+  *)
+    echo "ERROR: uname reports this OS is not Darwin or Linux. Exiting."
+  ;;
+esac
