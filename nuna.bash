@@ -20,8 +20,8 @@ alias deployments="cd \${NUNA_ROOT}/configs/nunahealth/aws/cloudformation/deploy
 alias chefshell="chef-apply -e 'require \"pry\"; binding.pry'"
 alias changepw="\${HOME}/code/changepw/changepw.py"
 alias bastion="\${HOME}/code/it-bastion-ssh-server/bastion.sh"
-alias mfa="/usr/local/bin/vault-auth-aws.sh"
-alias auth="mfa"
+alias mfa="vault-auth-aws.sh"
+alias auth="vault-auth-aws.sh"
 
 get-ami-id() {
     [[ -z ${1} ]] && {
