@@ -2,12 +2,16 @@
 
 case $(uname) in 
   Darwin)
+    append_inputrc
+    configure_vim
     xcode-select --install
     install_homebrew
     install_brew_apps
     return
     ;;
   Linux)
+    append_inputrc
+    configure_vim
     sudo apt-get update
     sudo apt-get install git
     return
@@ -25,6 +29,20 @@ else
   echo "git not found."
 fi
 
+append_inputrc()
+{
+  if ! grep "completion-ignore-case" ~/.inputrc &> /dev/null; then
+    printf "set completion-ignore-case On" >> ~/.inputrc
+  fi
+}
+
+configure_vim()
+{
+  mkdir -p ~/.vim/pack/default/start
+  git clone https://github.com/morhetz/gruvbox.git ~/.vim/pack/default/start/gruvbox
+  git clone https://github.com/sheerun/vim-polyglot ~/.vim/pack/default/start/vim-polyglot
+  ln -s .vimrc ~/.vimrc
+}
 
 install_bashit() 
 {
