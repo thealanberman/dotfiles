@@ -4,9 +4,6 @@
 # eval "$(pyenv init -)"
 # eval "$(pyenv virtualenv-init -)"
 # eval "$(pipenv --completion)"
-if [ -f $(brew --prefix)/opt/mcfly/mcfly.bash ]; then
-  . $(brew --prefix)/opt/mcfly/mcfly.bash
-fi
 export MFA_STS_DURATION=53200
 export NUNA_ROOT="${HOME}/code/analytics"
 export CHEF_ROOT="${HOME}/code/chef-repo"
