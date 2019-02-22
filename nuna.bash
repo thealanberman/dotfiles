@@ -14,7 +14,7 @@ export SSH_ENV="${HOME}/.ssh/environment"
 export ADMIN_USERNAME='alan-admin'
 export VAULT_ADDR="https://vault.int.nunahealth.com"
 export GOPATH="${HOME}/code/go"
-export CDPATH=:..:~:${NUNA_ROOT}/configs/nunahealth/aws/cloudformation
+export CDPATH=:..:~:${NUNA_ROOT}/configs/nunahealth/aws/cloudformation:${NUNA_ROOT}/configs/nunahealth:~/code:
 
 alias nuna="/usr/local/bin/code \${BASH_IT}/custom/nuna.bash"
 alias repo="cd \${CHEF_ROOT}"
@@ -34,17 +34,8 @@ get-ami-id() {
     aws cloudformation describe-stacks --stack-name "${1}" --query "Stacks[0].Parameters[?ParameterKey=='ImageId'].ParameterValue" --output text
 }
 
-cg() {
-    # Shorthand for chef generate.
-    FIRST="${1}"
-    shift
-    THEREST="${*}"
-    chef generate "${FIRST}" -g "${CHEF_ROOT}/customizations/stove/" "${CHEF_ROOT}/cookbooks/${THEREST}"
-}
-
 chefnode() {
-    # [ -z ${1} && -z ${2} ] && { echo "Please specify a subcommand and search term."; return 1; }
-    pushd "${CHEF_ROOT}" >/dev/null
+    pushd "${CHEF_ROOT}" || return
 
     case ${1} in
         details)
@@ -69,7 +60,7 @@ chefnode() {
             ;;
     esac
 
-    popd >/dev/null
+    popd || return
 }
 
 
@@ -87,20 +78,20 @@ sandbox() {
             echo -n "Sandbox ${sandbox_name}.sandbox.int.nunahealth.com is: "
             aws ec2 describe-instance-status --instance-ids "${sandbox_instance_id}" --query "InstanceStatuses[0].InstanceState.Name" --output text
             ;;
-        stop)
+        stop|halt)
             echo "Stopping Sandbox ${sandbox_name}.sandbox.int.nunahealth.com..."
             aws ec2 stop-instances --instance-ids "${sandbox_instance_id}"
             aws ec2 wait instance-stopped --instance-ids "${sandbox_instance_id}" && \
             echo "Sandbox is now stopped."
             ;;
-        start)
+        start|up)
             sandbox_instance_id="$(aws cloudformation describe-stack-resource --stack-name CommercialSandboxStateless-"${sandbox_name}" --logical-resource-id CommercialSandboxInstance --query 'StackResourceDetail.PhysicalResourceId' --output text)"
             aws ec2 start-instances --instance-ids "${sandbox_instance_id}" && \
             echo "Waiting for Sandbox ${sandbox_name}.sandbox.int.nunahealth.com to start..."
             aws ec2 wait instance-running --instance-ids "${sandbox_instance_id}" && \
             echo "Sandbox is now running."
             ;;
-        connect)
+        connect|ssh)
             ssh -A -o ConnectTimeout=1 "${sandbox_name}.sandbox.int.nunahealth.com" || \
             echo "ERROR: Check VPN connection?"
             ;;
@@ -130,11 +121,10 @@ ssh-yubikey-pub() {
 instance() {
     case "${1}" in
         search)
-            /usr/local/bin/awless list instances --filter name="${2}"
+            awless list instances --filter name="${2}"
             ;;
         *)
-            echo "USAGE:"
-            echo "  instance search <name or partial name>"
+            printf "USAGE:\n\tinstance search <name or partial name>\n"
             ;;
     esac
 }
