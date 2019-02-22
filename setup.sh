@@ -1,5 +1,16 @@
 #!/usr/bin/env bash
 
+# Exit on error. Append "|| true" if you expect an error.
+set -o errexit # set -e
+# Exit on error inside any functions or subshells.
+set -o errtrace # set -E
+# Do not allow use of undefined vars. Use ${VAR:-} to use an undefined VAR
+set -o nounset # set -u
+# Catch the error in case 1st command fails but piped command succeeds
+set -o pipefail
+# Turn on traces, useful while debugging
+set -o xtrace # set -x
+
 case $(uname) in 
   Darwin)
     append_inputrc
@@ -21,10 +32,6 @@ case $(uname) in
   ;;
 esac
 
-
-# can't install bash-it without git
-git --version 1> /dev/null && install_bashit
-
 append_inputrc()
 {
   if ! grep "completion-ignore-case" ~/.inputrc &> /dev/null; then
@@ -42,14 +49,14 @@ configure_vim()
 
 install_bashit() 
 {
-  git --version || return
+  # can't install bash-it without git
+  git --version || return 
   read -e -s -p "Install Bash-it [y/N]? " -n 1 -r
   if [[ $REPLY =~ ^[Yy]$ ]]; then
     /usr/bin/git clone --depth=1 https://github.com/Bash-it/bash-it.git "${HOME}/.bash-it"
     eval "${HOME}/.bash-it/install.sh --silent --no-modify-config"
   fi
 }
-
 
 install_homebrew()
 {
@@ -58,7 +65,6 @@ install_homebrew()
     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
   fi
 }
-
 
 install_brew_apps()
 {
