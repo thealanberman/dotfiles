@@ -3,16 +3,18 @@
 case $(uname) in 
   Darwin)
     append_inputrc
-    configure_vim
     xcode-select --install
     install_homebrew
     install_brew_apps
+    install_bashit
+    configure_vim
     ;;
   Linux)
     append_inputrc
-    configure_vim
     sudo apt-get update
     sudo apt-get install git
+    install_bashit
+    configure_vim
     ;;
   *)
     echo "ERROR: uname reports this OS is not Darwin or Linux. Exiting."
@@ -40,6 +42,7 @@ configure_vim()
 
 install_bashit() 
 {
+  git --version || return
   read -e -s -p "Install Bash-it [y/N]? " -n 1 -r
   if [[ $REPLY =~ ^[Yy]$ ]]; then
     /usr/bin/git clone --depth=1 https://github.com/Bash-it/bash-it.git "${HOME}/.bash-it"
