@@ -21,11 +21,7 @@ esac
 
 
 # can't install bash-it without git
-if [[ $(git --version) ]]; then
-  install_bashit
-else
-  echo "git not found."
-fi
+git --version 1> /dev/null && install_bashit
 
 append_inputrc()
 {
