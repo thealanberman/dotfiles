@@ -123,8 +123,16 @@ instance() {
         search)
             awless list instances --filter name="${2}"
             ;;
+        ssh)
+            [[ ${3} ]] && role="role=${2}-${3}" || role="foo"
+            local i=$(awless list instances --filter name="${2}" --tag "${role}" --columns name --no-headers --format csv)
+            awless ssh --private "${USER}@${i}"
+            ;;
         *)
-            printf "USAGE:\n\tinstance search <name or partial name>\n"
+            printf "USAGE:\n\t"
+            printf "instance search <name or partial name>\n\t"
+            printf "instance ssh <name or private IP>\n\t"
+            printf "instance ssh <service> <tier>"
             ;;
     esac
 }
