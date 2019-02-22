@@ -34,6 +34,7 @@ alias reload="source ${HOME}/.bash_profile"
 alias ports="lsof -i -U -n -P | grep LISTEN"
 alias listening='ports'
 alias ag='echo "use rg instead"'
+alias t="tmux attach || tmux new"
 
 [[ "$(command -v thefuck)" ]] && { eval "$(thefuck --alias)"; }
 source <(awless completion bash)
@@ -41,18 +42,21 @@ source <(awless completion bash)
 # --------------------------------- #
 # FUNCTIONS
 # --------------------------------- #
-s3cat() {
+s3cat ()
+{
     [[ -n "${1}" ]] || { echo "Usage: s3cat <full S3 URL>"; return 1; }
     aws s3 cp "${1}" - | cat
 }
 
-s3bat() {
+s3bat ()
+{
     [[ -n "${1}" ]] || { echo "Usage: s3cat <full S3 URL>"; return 1; }
     which bat > /dev/null || { echo "bat not installed"; return 1; }
     aws s3 cp "${1}" - | bat
 }
 
-dmg() {
+dmg ()
+{
     if [[ -d ${1} ]] && [[ -d ${2} ]]; then
         VOL="$(basename "${1}")"
         hdiutil create -fs HFS+ -volname "${VOL}" -srcfolder "${1}" "${2}"/"${VOL}"
@@ -62,7 +66,8 @@ dmg() {
 }
 
 
-ff() {
+ff ()
+{
     if [[ -z "${1}" ]]; then
         echo "Usage: ff <search term>"
     else
@@ -70,7 +75,8 @@ ff() {
     fi
 }
 
-flatten() {
+flatten ()
+{
     [[ "$(command -v pdf2ps)" ]] || { echo "brew install ghostscript"; return 1; }
     if [[ -z "${1}" ]]; then
         echo "Usage: flatten <file>"
@@ -79,20 +85,23 @@ flatten() {
     fi
 }
 
-caps () {
+caps ()
+{
     awk '{print toupper(substr($0,0,1))tolower(substr($0,2))}' <<<"${1}"
 }
 
-lower () { 
+lower ()
+{
   tr '[:upper:]' '[:lower:]' <<<"${1}"
 }
 
-upper () {
+upper ()
+{
   tr '[:lower:]' '[:upper:]' <<<"${1}"
 }
 
 # same as dd but with progress meter!
-ddprogress () 
+ddprogress ()
 {
     [ "$(which pv)" ] ||  { echo "brew install pv first"; return; }
     [ -e "${2}" ] || echo "Usage: ddprogress [SOURCE] [DESTINATION]"
@@ -115,7 +124,7 @@ qr()
     qrencode "${1}" -o /tmp/qrcode.png && open /tmp/qrcode.png
 }
 
-serverhere() 
+serverhere()
 {
     myip=$(ifconfig en0 | grep "inet " | awk -F'[: ]+' '{ print $2 }');
     echo "point your browser to http://${myip}:8000";
