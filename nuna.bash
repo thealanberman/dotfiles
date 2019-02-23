@@ -23,14 +23,6 @@ alias bastion="\${HOME}/code/it-bastion-ssh-server/bastion.sh"
 alias mfa="vault-auth-aws.sh"
 alias auth="vault-auth-aws.sh"
 
-get-ami-id() {
-    [[ -z ${1} ]] && {
-        echo "Usage: get-ami-id <ASG stack_name>"
-        return
-    }
-    aws cloudformation describe-stacks --stack-name "${1}" --query "Stacks[0].Parameters[?ParameterKey=='ImageId'].ParameterValue" --output text
-}
-
 chefnode() {
     pushd "${CHEF_ROOT}" || return
 
@@ -68,7 +60,7 @@ sandbox() {
             echo "  Default username: ${USER}"
     }
     sandbox_name="${2:-${USER}}"
-    aws sts get-caller-identity > /dev/null 2>&1 || { echo "ERROR: 'mfa' first!"; return 1; }
+    aws sts get-caller-identity > /dev/null 2>&1 || { echo "ERROR: 'vault-auth-aws.sh' first!"; return 1; }
     case "${1}" in
         status)
             sandbox_instance_id="$(aws cloudformation describe-stack-resource --stack-name CommercialSandboxStateless-"${sandbox_name}" --logical-resource-id CommercialSandboxInstance --query 'StackResourceDetail.PhysicalResourceId' --output text)"
@@ -90,16 +82,12 @@ sandbox() {
             ;;
         connect|ssh)
             ssh -A -o ConnectTimeout=1 "${sandbox_name}.sandbox.int.nunahealth.com" || \
-            echo "ERROR: Check VPN connection?"
+            echo "ERROR: Can't reach host. Check VPN connection?"
             ;;
         *)
             sandbox_help
             ;;
     esac
-}
-
-bootstrapper() {
-    source "${CHEF_ROOT}/customizations/scripts/bootstrapper.sh"
 }
 
 ssh-add() {
@@ -116,29 +104,44 @@ ssh-yubikey-pub() {
 }
 
 instance() {
+    instancehelp() {
+        printf "USAGE:\n\t"
+        printf "instance search <name or partial name>\n\t"
+        printf "instance ami <name or partial name>\n\t"
+        printf "instance ssh <name or private IP>\n\t"
+        printf "instance ssh <service> <tier>\n"
+    }
     case "${1}" in
         search)
             awless list instances --filter name="${2}"
             ;;
         ssh)
-            [[ ${3} ]] && role="role=${2}-${3}" || role="foo"
-            local i=$(awless list instances --filter name="${2}" --tag "${role}" --columns name --no-headers --format csv)
+            [[ "${2}" ]] || instancehelp; return 1
+            [[ "${3}" ]] && role="role=${2}-${3}" || role="foo"
+            local i
+            i=$(awless list instances --filter name="${2}" --tag "${role}" --columns name --no-headers --format csv)
             awless ssh --private "${USER}@${i}"
             ;;
+        ami)
+            local instance_id
+            instance_id=$(awless list instances --filter name="${2}" --ids | grep '^i-')
+            aws ec2 describe-instances --instance-ids "${instance_id}" \
+                --query "Reservations[0].Instances[0].ImageId" \
+                --output text
+            ;;
         *)
-            printf "USAGE:\n\t"
-            printf "instance search <name or partial name>\n\t"
-            printf "instance ssh <name or private IP>\n\t"
-            printf "instance ssh <service> <tier>\n"
+            instancehelp
             ;;
     esac
 }
 
 stack() {
     stackhelp() {
-            echo "USAGE:"
-            echo "  stack search <search term>"
-            echo "  stack delete <stack name>"
+            printf "USAGE:\n\t"
+            printf "stack search <search term>\n\t"
+            printf "stack info <stack name>\n\t"
+            printf "stack ami <stack name>\n\t"
+            printf "stack delete <stack name>\n"
     }
     [ -z "${2}" ] && { stackhelp; return 1; }
     case "${1}" in
@@ -148,9 +151,15 @@ stack() {
             aws cloudformation wait stack-delete-complete --stack-name "${2}" && echo "${2} Deleted."
             ;;
         search)
-            aws cloudformation describe-stacks \
-            --query "Stacks[?StackName!='null']|[?contains(StackName,\`$2\`)==\`true\`].StackName" "${@:3}" \
-            --output table
+            awless list stacks --filter name="${2}"
+            ;;
+        ami)
+            aws cloudformation describe-stacks --stack-name "${2}" \
+                --query "Stacks[0].Parameters[?ParameterKey=='ImageId'].ParameterValue" \
+                --output text
+            ;;
+        info|show|status)
+            awless show "${2}"
             ;;
         *)
             stackhelp
