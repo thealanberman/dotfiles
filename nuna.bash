@@ -116,7 +116,7 @@ instance() {
             awless list instances --filter name="${2}"
             ;;
         ssh)
-            [[ "${2}" ]] || instancehelp; return 1
+            [[ "${2}" ]] || { instancehelp; return 1; }
             [[ "${3}" ]] && role="role=${2}-${3}" || role="foo"
             local i
             i=$(awless list instances --filter name="${2}" --tag "${role}" --columns name --no-headers --format csv)
