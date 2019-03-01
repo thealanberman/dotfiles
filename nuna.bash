@@ -168,7 +168,7 @@ stack() {
 }
 
 newscript() {
-    curl -s http://bash3boilerplate.sh/main.sh > "${1:-main.sh}" && echo "${1:-main.sh} created."
+    cp "${HOME}/main.sh" "${1:-main.sh}" && echo "${1:-main.sh} created."
 }
 
 initlog() {

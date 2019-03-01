@@ -35,6 +35,7 @@ alias ports="lsof -i -U -n -P | grep LISTEN"
 alias listening='ports'
 alias ag='echo "use rg instead"'
 alias t="tmux attach || tmux new"
+alias box="draw"
 
 [[ "$(command -v thefuck)" ]] && { eval "$(thefuck --alias)"; }
 source <(awless completion bash)
@@ -65,6 +66,17 @@ dmg ()
     fi
 }
 
+# output a handy chart of box drawing ascii characters
+draw() {
+cat <<EOF
+
+┃ ━ ┃
+┏ ┳ ┓
+┣ ╋ ┫
+┗ ┻ ┛
+
+EOF
+}
 
 ff ()
 {
