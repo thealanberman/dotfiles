@@ -23,6 +23,12 @@ alias bastion="\${HOME}/code/it-bastion-ssh-server/bastion.sh"
 alias mfa="vault-auth-aws.sh"
 alias auth="vault-auth-aws.sh"
 
+knife() {
+    pushd "${CHEF_ROOT}" || return
+    /usr/local/bin/knife "${*}"
+    popd || return
+}
+
 chefnode() {
     pushd "${CHEF_ROOT}" || return
 
@@ -81,8 +87,9 @@ sandbox() {
             echo "Sandbox is now running."
             ;;
         connect|ssh)
-            ssh -A -o ConnectTimeout=1 "${sandbox_name}.sandbox.int.nunahealth.com" || \
-            echo "ERROR: Can't reach host. Check VPN connection?"
+            ssh -A -o ConnectTimeout=1 "${sandbox_name}.sandbox.int.nunahealth.com" \
+                || echo "ERROR: Can't reach host. Check VPN connection?" \
+                && echo "sandbox session ended"
             ;;
         *)
             sandbox_help
