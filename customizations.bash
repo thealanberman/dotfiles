@@ -121,8 +121,8 @@ upper ()
 # same as dd but with progress meter!
 ddprogress ()
 {
-    [ "$(which pv)" ] ||  { echo "brew install pv first"; return; }
-    [ -e "${2}" ] || echo "Usage: ddprogress [SOURCE] [DESTINATION]"
+    [[ "$(command -v pv)" ]] ||  { echo "brew install pv first"; return; }
+    [[ -e "${2}" ]] || echo "Usage: ddprogress [SOURCE] [DESTINATION]"
     sudo pv -tpreb "${1}" | sudo dd bs=1m of="${2}"
 }
 
@@ -138,7 +138,7 @@ incognito ()
 # (macOS) generates a qr code and opens it in Preview
 qr()
 {
-    [ "$(which qrencode)" ] || { echo "brew install qrencode first"; return; }
+    [[ "$(command -v qrencode)" ]] || { echo "brew install qrencode first"; return; }
     qrencode "${1}" -o /tmp/qrcode.png && open /tmp/qrcode.png
 }
 
