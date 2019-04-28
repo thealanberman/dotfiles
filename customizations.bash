@@ -24,12 +24,18 @@ alias sshconfig="${EDITOR} ${HOME}/.ssh/config"
 alias dev='cd ~/code'
 alias cd..='cd ..'
 alias df='df -H'
+alias ytaudio="youtube-dl -f m4a"
 [[ "$(command -v thefuck)" ]] && { eval "$(thefuck --alias)"; }
 
 
 # --------------------------------- #
 # FUNCTIONS
 # --------------------------------- #
+anybar() { 
+    pgrep AnyBar 1>/dev/null || open -a AnyBar
+    echo -n "${1}" | nc -4u -w0 localhost "${2:-1738}"
+}
+
 dmg() {
     if [[ -d ${1} ]] && [[ -d ${2} ]]; then
         VOL="$(basename "${1}")"
