@@ -4,6 +4,7 @@
 # eval "$(pyenv init -)"
 # eval "$(pyenv virtualenv-init -)"
 # eval "$(pipenv --completion)"
+eval "$(rbenv init -)"
 export MFA_STS_DURATION=53200
 export NUNA_ROOT="${HOME}/code/analytics"
 export CHEF_ROOT="${HOME}/code/chef-repo"
@@ -23,11 +24,11 @@ alias bastion="\${HOME}/code/it-bastion-ssh-server/bastion.sh"
 alias mfa="vault-auth-aws.sh"
 alias auth="vault-auth-aws.sh"
 
-knife() {
-    pushd "${CHEF_ROOT}" || return
-    /usr/local/bin/knife "${*}"
-    popd || return
-}
+# knife() {
+#     pushd "${CHEF_ROOT}" || return
+#     /usr/local/bin/knife "${*}"
+#     popd || return
+# }
 
 chefnode() {
     pushd "${CHEF_ROOT}" || return

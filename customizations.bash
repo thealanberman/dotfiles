@@ -24,6 +24,7 @@ alias sshconfig="${EDITOR} ${HOME}/.ssh/config"
 alias dev="cd ${HOME}/code"
 alias cd..='cd ..'
 alias df='df -H'
+alias ytaudio="youtube-dl -f m4a"
 alias plistbuddy='/usr/libexec/PlistBuddy'
 alias ping='ping --apple-time'
 alias now="date +%Y%m%dT%H%M%S"
@@ -36,12 +37,26 @@ alias listening='ports'
 alias t="tmux attach || tmux new"
 alias box="draw"
 
+# --------------------------------- #
+# BASH COMPLETIONS
+# --------------------------------- #
 [[ "$(command -v thefuck)" ]] && { eval "$(thefuck --alias)"; }
+# [[ "$(command -v bsed)" ]] && { eval "$(register-python-argcomplete bsed)"; }
 source <(awless completion bash)
+
+# --------------------------------- #
+# PRETTIER XTRACE OUTPUT
+# --------------------------------- #
+export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
 
 # --------------------------------- #
 # FUNCTIONS
 # --------------------------------- #
+anybar() { 
+    pgrep AnyBar 1>/dev/null || open -a AnyBar
+    echo -n "${1}" | nc -4u -w0 localhost "${2:-1738}"
+}
+
 s3cat ()
 {
     [[ -n "${1}" ]] || { echo "Usage: s3cat <full S3 URL>"; return 1; }
@@ -114,8 +129,8 @@ upper ()
 # same as dd but with progress meter!
 ddprogress ()
 {
-    [ "$(which pv)" ] ||  { echo "brew install pv first"; return; }
-    [ -e "${2}" ] || echo "Usage: ddprogress [SOURCE] [DESTINATION]"
+    [[ "$(command -v pv)" ]] ||  { echo "brew install pv first"; return; }
+    [[ -e "${2}" ]] || echo "Usage: ddprogress [SOURCE] [DESTINATION]"
     sudo pv -tpreb "${1}" | sudo dd bs=1m of="${2}"
 }
 
@@ -131,7 +146,7 @@ incognito ()
 # (macOS) generates a qr code and opens it in Preview
 qr()
 {
-    [ "$(which qrencode)" ] || { echo "brew install qrencode first"; return; }
+    [[ "$(command -v qrencode)" ]] || { echo "brew install qrencode first"; return; }
     qrencode "${1}" -o /tmp/qrcode.png && open /tmp/qrcode.png
 }
 
