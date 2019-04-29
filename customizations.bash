@@ -37,8 +37,17 @@ alias ag='echo "use rg instead"'
 alias t="tmux attach || tmux new"
 alias box="draw"
 
+# --------------------------------- #
+# BASH COMPLETIONS
+# --------------------------------- #
 [[ "$(command -v thefuck)" ]] && { eval "$(thefuck --alias)"; }
+# [[ "$(command -v bsed)" ]] && { eval "$(register-python-argcomplete bsed)"; }
 source <(awless completion bash)
+
+# --------------------------------- #
+# PRETTIER XTRACE OUTPUT
+# --------------------------------- #
+export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
 
 # --------------------------------- #
 # FUNCTIONS
