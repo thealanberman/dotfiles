@@ -26,7 +26,6 @@ alias macdown="open -a MacDown"
 alias reload="source ${HOME}/.bash_profile"
 alias ports="lsof -i -U -n -P | grep LISTEN"
 alias listening='ports'
-alias ag='echo "use rg instead"'
 alias t="tmux attach || tmux new"
 alias box="draw"
 
