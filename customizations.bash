@@ -3,15 +3,7 @@
 # --------------------------------- #
 # EDITOR
 # --------------------------------- #
-if [[ "$(command -v code)" ]]; then
-    EDITOR="$(command -v code)"
-elif [[ "$(command -v atom)" ]]; then
-    EDITOR="$(command -v atom)"
-else
-    EDITOR="$(command -v vim)"
-fi
-export EDITOR="${EDITOR}"
-
+export EDITOR="vim"
 
 # --------------------------------- #
 # ALIASES
@@ -48,7 +40,7 @@ source <(awless completion bash)
 # --------------------------------- #
 # PRETTIER XTRACE OUTPUT
 # --------------------------------- #
-export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
+export PS4='\e[2m+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }\e[0m'
 
 # --------------------------------- #
 # FUNCTIONS
