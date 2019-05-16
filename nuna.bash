@@ -197,3 +197,10 @@ prompw () {
     [[ "${1}" == "dev" || "${1}" == "prod" ]] || { echo "ERROR: must specify 'dev' or 'prod'"; return 1; }
     vault read -field=value "nuna/${1}/prometheus/http/password" | pbcopy && echo "clipboarded"
 }
+
+rds () {
+    [[ -z ${1} || -z ${2} ]] && { echo "USAGE: rds <service> <tier>"; return 1; }
+    local role="${1}"
+    local tier="${2}"
+    dig "rds-${role}-${tier}.int.nunahealth.com" CNAME +short @10.8.0.2 | sed 's,\..*,,'
+}
