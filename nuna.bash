@@ -199,8 +199,8 @@ prompw () {
 }
 
 rds () {
-    [[ -z ${1} || -z ${2} ]] && { echo "USAGE: rds <service> <tier>"; return 1; }
     local role="${1}"
     local tier="${2}"
+    [[ -z ${role} || -z ${tier} ]] && { echo "USAGE: rds <service> <tier>"; return 1; }
     dig "rds-${role}-${tier}.int.nunahealth.com" CNAME +short @10.8.0.2 | sed 's,\..*,,'
 }
