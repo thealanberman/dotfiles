@@ -24,14 +24,8 @@ alias bastion="\${HOME}/code/it-bastion-ssh-server/bastion.sh"
 alias mfa="vault-auth-aws.sh"
 alias auth="vault-auth-aws.sh"
 
-# knife() {
-#     pushd "${CHEF_ROOT}" || return
-#     /usr/local/bin/knife "${*}"
-#     popd || return
-# }
-
 chefnode() {
-    pushd "${CHEF_ROOT}" || return
+    cd "${CHEF_ROOT}" || return
 
     case ${1} in
         details)
@@ -45,29 +39,32 @@ chefnode() {
         last10)
             knife runs list "$(knife node list | grep "${2}")"
             ;;
+        env|environment)
+            knife search "chef_environment:${2}" -i
+            ;;
         *)
             echo "Valid chefnode subcommands:"
             echo "  details <search term>"
             echo "      Show node hardware and OS details"
+            echo "  env <environment>"
+            echo "      Show nodes in <environment>"
             echo "  lastrun <search term>"
             echo "      Show last chef run results"
             echo "  last10 <search term>"
             echo "      Show results of last 10 chef runs."
             ;;
     esac
-
-    popd || return
 }
 
 
 sandbox() {
     sandbox_help() {
             echo "USAGE:"
-            echo "  sandbox <status|start|connect|stop> [username]"
+            echo "  sandbox <status|up|ssh|stop> [username]"
             echo "  Default username: ${USER}"
     }
     sandbox_name="${2:-${USER}}"
-    aws sts get-caller-identity > /dev/null 2>&1 || { echo "ERROR: 'vault-auth-aws.sh' first!"; return 1; }
+    aws sts get-caller-identity &> /dev/null || { echo "ERROR: Auth first!"; return 1; }
     case "${1}" in
         status)
             sandbox_instance_id="$(aws cloudformation describe-stack-resource --stack-name CommercialSandboxStateless-"${sandbox_name}" --logical-resource-id CommercialSandboxInstance --query 'StackResourceDetail.PhysicalResourceId' --output text)"
@@ -89,8 +86,7 @@ sandbox() {
             ;;
         connect|ssh)
             ssh -A -o ConnectTimeout=1 "${sandbox_name}.sandbox.int.nunahealth.com" \
-                || echo "ERROR: Can't reach host. Check VPN connection?" \
-                && echo "sandbox session ended"
+                || echo "ERROR: Can't reach host. Check VPN connection?"
             ;;
         *)
             sandbox_help
@@ -180,15 +176,17 @@ newscript() {
 }
 
 initlog() {
-    [[ -z "${1}" ]] && { \
-        printf "ABOUT\n\tDisplays the latest cloud init log for a service + tier.\nUSAGE\n\tinitlog <service> <tier>\n"
+    if [[ -z "${1}" ]]; then
+        printf "ABOUT\n"
+        printf "\tDisplays the latest cloud init log for a service + tier.\n"
+        printf "USAGE\n"
+        printf "\tinitlog <service> <tier>\n"
         return 1
-        }
+    fi
+    aws sts get-caller-identity &> /dev/null || { echo "ERROR: Auth first!"; return 1; }
     local latestlog
     latestlog=$(aws s3 ls "s3://nunahealth-conf/status/${1}/${2}/" | tail -n1 | awk '{print $4}')
-    [[ "${3}" == "cat" ]] && \
-    aws s3 cp "s3://nunahealth-conf/status/${1}/${2}/${latestlog}" - | cat || \
-    aws s3 cp "s3://nunahealth-conf/status/${1}/${2}/${latestlog}" - | bat
+    aws s3 cp "s3://nunahealth-conf/status/${1}/${2}/${latestlog}" - | cat
 }
 
 # Called as `prompw prod` this fetches the prod password from vault and puts it in your Mac's clipboard
