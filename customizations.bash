@@ -28,6 +28,7 @@ alias ports="lsof -i -U -n -P | grep LISTEN"
 alias listening='ports'
 alias t="tmux attach || tmux new"
 alias box="draw"
+alias cat="highlight $1 --out-format xterm256 --line-numbers --quiet --force --style solarized-light"
 
 # --------------------------------- #
 # BASH COMPLETIONS
@@ -40,6 +41,12 @@ source <(awless completion bash)
 # PRETTIER XTRACE OUTPUT
 # --------------------------------- #
 export PS4='\e[2m+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }\e[0m'
+
+# --------------------------------- #
+# BETTER LESS OUTPUT
+# --------------------------------- #
+export LESSOPEN="| $(which highlight) %s --out-format xterm256 --quiet --force --style solarized-light"
+export LESS=" -R"
 
 # --------------------------------- #
 # FUNCTIONS

@@ -61,6 +61,7 @@ install_brew_apps()
     ffmpeg \
     git \
     grep \
+    highlight \
     jq \
     openssh \
     openssl \
