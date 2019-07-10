@@ -12,7 +12,7 @@ export SSH_ENV="${HOME}/.ssh/environment"
 export ADMIN_USERNAME='alan-admin'
 export VAULT_ADDR="https://vault.int.nunahealth.com"
 export GOPATH="${HOME}/code/go"
-export CDPATH=:..:~:${NUNA_ROOT}/configs/nunahealth/aws/cloudformation:${NUNA_ROOT}/configs/nunahealth:~/code:
+export CDPATH=:..:~:${NUNA_ROOT}/configs/nunahealth/aws/cloudformation:${NUNA_ROOT}/configs/nunahealth:${HOME}/code:
 
 alias nuna="/usr/local/bin/code \${BASH_IT}/custom/nuna.bash"
 alias repo="cd \${CHEF_ROOT}"
@@ -21,8 +21,8 @@ alias deployments="cd \${NUNA_ROOT}/configs/nunahealth/aws/cloudformation/deploy
 alias chefshell="chef-apply -e 'require \"pry\"; binding.pry'"
 alias changepw="\${HOME}/code/changepw/changepw.py"
 alias bastion="\${HOME}/code/it-bastion-ssh-server/bastion.sh"
-alias mfa="vault-auth-aws.sh"
-alias auth="vault-auth-aws.sh"
+alias mfa="vault-auth-aws-init"
+alias auth="mfa"
 
 chefnode() {
     cd "${CHEF_ROOT}" || return

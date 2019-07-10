@@ -16,6 +16,7 @@ alias sshconfig="${EDITOR} ${HOME}/.ssh/config"
 alias dev="cd ${HOME}/code"
 alias cd..='cd ..'
 alias df='df -H'
+alias ff='fd'
 alias ytaudio="youtube-dl -f m4a"
 alias plistbuddy='/usr/libexec/PlistBuddy'
 alias ping='ping --apple-time'
@@ -89,15 +90,6 @@ cat <<EOF
 ┗ ┻ ┛
 
 EOF
-}
-
-ff ()
-{
-    if [[ -z "${1}" ]]; then
-        echo "Usage: ff <search term>"
-    else
-        find . -iname "${1}" 2>/dev/null
-    fi
 }
 
 flatten ()
