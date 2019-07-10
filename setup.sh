@@ -56,25 +56,32 @@ install_brew_apps()
     awless \
     awscli \
     bash \
+    bat \
     dc3dd \
     dockutil \
+    fd \
     ffmpeg \
     git \
     grep \
     highlight \
     jq \
+    micro \
     openssh \
     openssl \
-    pipenv \
     psgrep \
+    pv \
     python \
     ripgrep \
     ruby \
+    sd \
     shellcheck \
     thefuck \
+    tmux \
     tree \
     vim \
-    wget 
+    wget \
+    youtube-dl \
+    yq
   fi
 }
 
