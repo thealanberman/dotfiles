@@ -7,7 +7,6 @@
 eval "$(rbenv init -)"
 export MFA_STS_DURATION=53200
 export NUNA_ROOT="${HOME}/code/analytics"
-export CHEF_ROOT="${HOME}/code/chef-repo"
 export SSH_ENV="${HOME}/.ssh/environment"
 export ADMIN_USERNAME='alan-admin'
 export VAULT_ADDR="https://vault.int.nunahealth.com"
@@ -15,46 +14,21 @@ export GOPATH="${HOME}/code/go"
 export CDPATH=:..:~:${NUNA_ROOT}/configs/nunahealth/aws/cloudformation:${NUNA_ROOT}/configs/nunahealth:${HOME}/code:
 
 alias nuna="/usr/local/bin/code \${BASH_IT}/custom/nuna.bash"
-alias repo="cd \${CHEF_ROOT}"
-alias analytics="cd \${NUNA_ROOT}/configs/nunahealth/aws"
+alias analytics="cd \${NUNA_ROOT}"
 alias deployments="cd \${NUNA_ROOT}/configs/nunahealth/aws/cloudformation/deployments"
-alias chefshell="chef-apply -e 'require \"pry\"; binding.pry'"
 alias changepw="\${HOME}/code/changepw/changepw.py"
 alias bastion="\${HOME}/code/it-bastion-ssh-server/bastion.sh"
 alias mfa="vault-auth-aws-init"
-alias auth="mfa"
+alias mfaidm="vault-auth-aws-init -a nuna-identity-management -r admin"
 
-chefnode() {
-    cd "${CHEF_ROOT}" || return
-
-    case ${1} in
-        details)
-            for line in $(knife node list | grep "${2}"); do
-                knife node show "${line}" -a hostname -a hardware -a macaddress
-            done
-            ;;
-        lastrun)
-            knife runs show "$(knife runs list "$(knife node list | grep "${2}")" -r 1 | grep run_id | sed -n -e 's/^run_id:     //p')"
-            ;;
-        last10)
-            knife runs list "$(knife node list | grep "${2}")"
-            ;;
-        env|environment)
-            knife search "chef_environment:${2}" -i
-            ;;
-        *)
-            echo "Valid chefnode subcommands:"
-            echo "  details <search term>"
-            echo "      Show node hardware and OS details"
-            echo "  env <environment>"
-            echo "      Show nodes in <environment>"
-            echo "  lastrun <search term>"
-            echo "      Show last chef run results"
-            echo "  last10 <search term>"
-            echo "      Show results of last 10 chef runs."
-            ;;
-    esac
+daily() {
+    vpn \
+    && mfa \
+    && sleep 10 \
+    && sandbox up \
+    && sandbox ssh
 }
+
 
 
 sandbox() {
@@ -123,12 +97,12 @@ instance() {
             [[ "${2}" ]] || { instancehelp; return 1; }
             [[ "${3}" ]] && role="role=${2}-${3}" || role="foo"
             local i
-            i=$(awless list instances --filter name="${2}" --tag "${role}" --columns name --no-headers --format csv)
+            i=$(awless list instances --filter name="${2}" --filter state=running --tag "${role}" --columns name --no-headers --format csv)
             awless ssh --private "${USER}@${i}"
             ;;
         ami)
             local instance_id
-            instance_id=$(awless list instances --filter name="${2}" --ids | grep '^i-')
+            instance_id=$(awless list instances --filter name="${2}" --filter state=running --ids | grep '^i-')
             aws ec2 describe-instances --instance-ids "${instance_id}" \
                 --query "Reservations[0].Instances[0].ImageId" \
                 --output text
