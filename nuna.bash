@@ -97,12 +97,12 @@ instance() {
             [[ "${2}" ]] || { instancehelp; return 1; }
             [[ "${3}" ]] && role="role=${2}-${3}" || role="foo"
             local i
-            i=$(awless list instances --filter name="${2}" --filter state=running --tag "${role}" --columns name --no-headers --format csv)
+            i=$(awless list instances --filter name="${2}" --tag "${role}" --columns name --no-headers --format csv)
             awless ssh --private "${USER}@${i}"
             ;;
         ami)
             local instance_id
-            instance_id=$(awless list instances --filter name="${2}" --filter state=running --ids | grep '^i-')
+            instance_id=$(awless list instances --filter name="${2}" --ids | grep '^i-')
             aws ec2 describe-instances --instance-ids "${instance_id}" \
                 --query "Reservations[0].Instances[0].ImageId" \
                 --output text
