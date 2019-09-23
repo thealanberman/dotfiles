@@ -30,6 +30,7 @@ alias listening='ports'
 alias t="tmux attach || tmux new"
 alias box="draw"
 alias ccat="highlight $1 --out-format xterm256 --line-numbers --quiet --force --style solarized-light"
+alias zshell="PS1='[%n] %~%% ' zsh"
 
 # --------------------------------- #
 # BASH COMPLETIONS

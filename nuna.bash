@@ -5,6 +5,7 @@
 # eval "$(pyenv virtualenv-init -)"
 # eval "$(pipenv --completion)"
 eval "$(rbenv init -)"
+export KEYBASE=true
 export MFA_STS_DURATION=53200
 export NUNA_ROOT="${HOME}/code/analytics"
 export SSH_ENV="${HOME}/.ssh/environment"
@@ -124,7 +125,9 @@ stack() {
     [ -z "${2}" ] && { stackhelp; return 1; }
     case "${1}" in
         delete)
+            set -x
             aws cloudformation delete-stack --stack-name "${2}"
+            { set +x; } 2>&-
             echo "Waiting for confirmation..."
             aws cloudformation wait stack-delete-complete --stack-name "${2}" && echo "${2} Deleted."
             ;;
