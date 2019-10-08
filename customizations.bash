@@ -5,11 +5,13 @@
 # --------------------------------- #
 export EDITOR="vim"
 
-# --------------------------------- #
+#--------------------------------- #
 # ALIASES
 # --------------------------------- #
-alias l='ls -AGhlF'
+alias ls='lsd --group-dirs first'
+alias l='ls -Al'
 alias ll='l'
+alias lt='ls --tree'
 SELF="$(basename "${BASH_SOURCE}")"
 alias aliases="${EDITOR} ${BASH_IT}/custom/${SELF}"
 alias sshconfig="${EDITOR} ${HOME}/.ssh/config"
@@ -38,6 +40,11 @@ alias zshell="PS1='[%n] %~%% ' zsh"
 [[ "$(command -v thefuck)" ]] && { eval "$(thefuck --alias)"; }
 # [[ "$(command -v bsed)" ]] && { eval "$(register-python-argcomplete bsed)"; }
 source <(awless completion bash)
+
+# --------------------------------- #
+# SPEED UP DOCKER BUILDS
+# --------------------------------- #
+export DOCKER_BUILDKIT=1
 
 # --------------------------------- #
 # PRETTIER XTRACE OUTPUT
@@ -170,3 +177,19 @@ yaml2json ()
     ruby -ryaml -rjson -e 'puts JSON.pretty_generate(YAML.load(ARGF))' < "${1}" > "${1}.json"
     echo "Created ${1}.json"
 }
+
+pinger ()
+{	
+    ping_cancelled=false    # Keep track of whether the loop was cancelled, or succeeded
+    until ping -c1 "${1}" >/dev/null 2>&1; do :; done &    # The "&" backgrounds it
+    trap "kill $!; ping_cancelled=true" SIGINT
+    wait $!          # Wait for the loop to exit, one way or another
+    trap - SIGINT    # Remove the trap, now we're done with it
+    echo "Done pinging, cancelled=${ping_cancelled}"
+}
+
+kh () 
+{
+    sed -i.bak -e ${1}d "${HOME}/.ssh/known_hosts"
+}
+
