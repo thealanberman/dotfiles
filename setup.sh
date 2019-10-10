@@ -61,11 +61,13 @@ install_brew_apps()
     dockutil \
     fd \
     ffmpeg \
+    fselect \
     git \
     grep \
     highlight \
+    lazydocker \
+    lsd \
     jq \
-    micro \
     openssh \
     openssl \
     psgrep \
