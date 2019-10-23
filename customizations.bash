@@ -193,3 +193,23 @@ kh ()
     sed -i.bak -e ${1}d "${HOME}/.ssh/known_hosts"
 }
 
+retry () 
+{
+  [[ -z "${1}" ]] && { echo "USAGE: retry <number of tries> <command>"; return 1; }
+  local retries="${1}"
+  shift
+  local count=0
+  until "${@}"; do
+    exit=$?
+    wait=$((2 ** count))
+    count=$((count + 1))
+    if [[ ${count} < ${retries} ]]; then
+      echo "Retry ${count}/${retries} exited ${exit}, retrying in ${wait} seconds..."
+      sleep ${wait}
+    else
+      echo "Retry ${count}/${retries} exited ${exit}, no more retries left."
+      return ${exit}
+    fi
+  done
+  return 0
+}
