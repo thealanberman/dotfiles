@@ -19,7 +19,7 @@ alias dev="cd ${HOME}/code"
 alias cd..='cd ..'
 alias df='df -H'
 alias ff='fd'
-alias ytaudio="youtube-dl -f m4a"
+alias ytaudio="youtube-dl --ignore-errors --format m4a"
 alias plistbuddy='/usr/libexec/PlistBuddy'
 alias ping='ping --apple-time'
 alias now="date +%Y%m%dT%H%M%S"
@@ -31,6 +31,7 @@ alias ports="lsof -i -U -n -P | grep LISTEN"
 alias listening='ports'
 alias t="tmux attach || tmux new"
 alias box="draw"
+alias dcompose="docker-compose"
 alias ccat="highlight $1 --out-format xterm256 --line-numbers --quiet --force --style solarized-light"
 alias zshell="PS1='[%n] %~%% ' zsh"
 

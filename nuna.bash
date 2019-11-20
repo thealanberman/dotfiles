@@ -160,13 +160,18 @@ initlog() {
         printf "ABOUT\n"
         printf "\tDisplays the latest cloud init log for a service + tier.\n"
         printf "USAGE\n"
-        printf "\tinitlog <service> <tier>\n"
+        printf "\tinitlog <service> <tier> [optional: subrole]\n"
         return 1
     fi
     aws sts get-caller-identity &> /dev/null || { echo "ERROR: Auth first!"; return 1; }
     local latestlog
-    latestlog=$(aws s3 ls "s3://nunahealth-conf/status/${1}/${2}/" | tail -n1 | awk '{print $4}')
-    aws s3 cp "s3://nunahealth-conf/status/${1}/${2}/${latestlog}" - | cat
+    if [[ -z "${3:-}" ]]; then
+        latestlog=$(aws s3 ls "s3://nunahealth-conf/status/${1}/${2}/" | tail -n1 | awk '{print $4}')
+        aws s3 cp "s3://nunahealth-conf/status/${1}/${2}/${latestlog}" - | cat
+    else
+        latestlog=$(aws s3 ls "s3://nunahealth-conf/status/${1}/$3/${2}/" | tail -n1 | awk '{print $4}')
+        aws s3 cp "s3://nunahealth-conf/status/${1}/${3}/${2}/${latestlog}" - | cat
+    fi
 }
 
 # Called as `prompw prod` this fetches the prod password from vault and puts it in your Mac's clipboard
