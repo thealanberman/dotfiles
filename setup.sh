@@ -65,11 +65,17 @@ install_brew_apps()
     git \
     grep \
     highlight \
+    httpie \
     lazydocker \
     lsd \
     jq \
+    micro \
+    mtr \
+    navi \
     openssh \
     openssl \
+    pipx \
+    pipenv \
     psgrep \
     pv \
     python \
@@ -77,9 +83,11 @@ install_brew_apps()
     ruby \
     sd \
     shellcheck \
+    sipcalc \
     thefuck \
     tmux \
     tree \
+    usql \
     vim \
     wget \
     youtube-dl \
