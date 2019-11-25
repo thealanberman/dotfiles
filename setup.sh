@@ -59,6 +59,7 @@ install_brew_apps()
     bat \
     dc3dd \
     dockutil \
+    exa \
     fd \
     ffmpeg \
     fselect \

@@ -9,9 +9,9 @@ export EDITOR="vim"
 # ALIASES
 # --------------------------------- #
 alias ls='lsd --group-dirs first'
-alias l='ls -Al'
+alias l='exa -Falh --git'
 alias ll='l'
-alias lt='ls --tree'
+alias lt='exa --tree'
 SELF="$(basename "${BASH_SOURCE}")"
 alias aliases="${EDITOR} ${BASH_IT}/custom/${SELF}"
 alias sshconfig="${EDITOR} ${HOME}/.ssh/config"
