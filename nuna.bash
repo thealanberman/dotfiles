@@ -25,6 +25,7 @@ alias mfaidm="vault-auth-aws-init -a nuna-identity-management -r admin"
 daily() {
     set -x
     vpn \
+    && sleep 10 \
     && mfa \
     && sleep 10 \
     && sandbox up \
