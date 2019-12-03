@@ -73,10 +73,12 @@ install_brew_apps()
     micro \
     mtr \
     navi \
+    ncdu \
     openssh \
     openssl \
     pipx \
     pipenv \
+    progress \
     psgrep \
     pv \
     python \
