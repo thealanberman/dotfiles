@@ -64,6 +64,7 @@ sandbox() {
             echo "Sandbox is now running."
             ;;
         connect|ssh)
+            pgrep ssh-agent || ssh-add
             ssh -A -o ConnectTimeout=1 "${sandbox_name}.sandbox.int.nunahealth.com" \
                 || echo "ERROR: Can't reach host. Check VPN connection?"
             ;;
@@ -73,6 +74,7 @@ sandbox() {
     esac
 }
 
+# shellcheck disable=SC2120
 ssh-add() {
     if [ -n "$1" ]; then
         command ssh-add "${*}"
