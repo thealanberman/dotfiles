@@ -64,7 +64,7 @@ sandbox() {
             echo "Sandbox is now running."
             ;;
         connect|ssh)
-            pgrep ssh-agent || ssh-add
+            pgrep -q ssh-agent || ssh-add
             ssh -A -o ConnectTimeout=1 "${sandbox_name}.sandbox.int.nunahealth.com" \
                 || echo "ERROR: Can't reach host. Check VPN connection?"
             ;;
