@@ -62,7 +62,7 @@ install_brew_apps()
     exa \
     fd \
     ffmpeg \
-    fselect \
+    fselect \ # https://github.com/jhspetersson/fselect
     git \
     grep \
     highlight \
@@ -73,12 +73,10 @@ install_brew_apps()
     micro \
     mtr \
     navi \
-    ncdu \
     openssh \
     openssl \
     pipx \
     pipenv \
-    progress \
     psgrep \
     pv \
     python \
@@ -98,6 +96,21 @@ install_brew_apps()
   fi
 }
 
+install_linux_apps()
+{
+  # golang apps
+  go get -u github.com/wallix/awless
+  go get github.com/jesseduffield/lazydocker
+
+  # install cargo
+  curl https://sh.rustup.rs -sSf | sh
+
+  # install rust (cargo) apps
+  cargo install exa
+  cargo install sd
+  
+}
+
 case $(uname) in 
   Darwin)
     append_inputrc
@@ -110,7 +123,16 @@ case $(uname) in
   Linux)
     append_inputrc
     sudo apt-get update
-    sudo apt-get install git
+    sudo apt-get install \
+      git \
+      docker \
+      docker-compose \
+      fd-find \ # https://github.com/sharkdp/fd
+      bat \ # https://github.com/sharkdp/bat
+      ripgrep \ # https://github.com/BurntSushi/ripgrep#installation
+      tmux \ # https://github.com/tmux/tmux
+
+
     install_bashit
     configure_vim
     ;;
