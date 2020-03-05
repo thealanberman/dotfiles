@@ -2,7 +2,6 @@
 
 export PYENV_ROOT="${HOME}/.pyenv"  
 eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
 export MFA_STS_DURATION=53200
 export NUNA_ROOT="${HOME}/code/analytics"
 export SSH_ENV="${HOME}/.ssh/environment"
