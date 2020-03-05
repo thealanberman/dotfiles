@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 
 # --------------------------------- #
+# https://github.com/Bash-it/bash-it/tree/master/themes/powerline-multiline
+# --------------------------------- #
+export POWERLINE_LEFT_PROMPT="hostname scm terraform cwd"
+export POWERLINE_RIGHT_PROMPT="clock user_info"
+
+# --------------------------------- #
 # EDITOR
 # --------------------------------- #
 export EDITOR="vim"
@@ -8,7 +14,7 @@ export EDITOR="vim"
 #--------------------------------- #
 # ALIASES
 # --------------------------------- #
-alias ls='lsd --group-dirs first'
+alias ls='exa --group-directories-first'
 alias l='exa -Falh --git'
 alias ll='l'
 alias lt='exa --tree'
@@ -34,6 +40,8 @@ alias box="draw"
 alias dcompose="docker-compose"
 alias ccat="highlight $1 --out-format xterm256 --line-numbers --quiet --force --style solarized-light"
 alias zshell="PS1='[%n] %~%% ' zsh"
+alias python="${HOME}/.pyenv/versions/3.8.0/bin/python3.8"
+alias pip="${BREW_PREFIX}/Cellar/python/3.7.6_1/bin/pip3"
 
 # --------------------------------- #
 # BASH COMPLETIONS
@@ -61,11 +69,6 @@ export LESS=" -R"
 # --------------------------------- #
 # FUNCTIONS
 # --------------------------------- #
-anybar() { 
-    pgrep AnyBar 1>/dev/null || open -a AnyBar
-    echo -n "${1}" | nc -4u -w0 localhost "${2:-1738}"
-}
-
 s3cat ()
 {
     [[ -n "${1}" ]] || { echo "Usage: s3cat <full S3 URL>"; return 1; }
@@ -152,9 +155,9 @@ qr()
 
 serverhere()
 {
-    myip=$(ifconfig en0 | grep "inet " | awk -F'[: ]+' '{ print $2 }');
-    echo "point your browser to http://${myip}:8000";
-    python -m SimpleHTTPServer 8000;
+    myip=$(ifconfig en0 | grep "inet " | awk -F'[: ]+' '{ print $2 }')
+    echo "point your browser to http://${myip}:8000"
+    python3 -m http.server 8000
 }
 
 get_mac_address ()

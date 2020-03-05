@@ -1,11 +1,8 @@
 #!/usr/bin/env bash
 
-# export PYENV_ROOT="${HOME}/.pyenv"  
-# eval "$(pyenv init -)"
-# eval "$(pyenv virtualenv-init -)"
-# eval "$(pipenv --completion)"
-eval "$(rbenv init -)"
-export KEYBASE=true
+export PYENV_ROOT="${HOME}/.pyenv"  
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
 export MFA_STS_DURATION=53200
 export NUNA_ROOT="${HOME}/code/analytics"
 export SSH_ENV="${HOME}/.ssh/environment"
@@ -13,6 +10,10 @@ export ADMIN_USERNAME='alan-admin'
 export VAULT_ADDR="https://vault.int.nunahealth.com"
 export GOPATH="${HOME}/code/go"
 export CDPATH=:..:~:${NUNA_ROOT}/configs/nunahealth/aws/cloudformation:${NUNA_ROOT}/configs/nunahealth:${HOME}/code:
+
+# Terraform shared cache
+# See: https://www.terraform.io/docs/configuration/providers.html#provider-plugin-cache
+export TF_PLUGIN_CACHE_DIR="${HOME}/.terraform.d/plugin-cache"
 
 alias nuna="/usr/local/bin/code \${BASH_IT}/custom/nuna.bash"
 alias analytics="cd \${NUNA_ROOT}"
