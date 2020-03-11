@@ -15,7 +15,7 @@ export EDITOR="vim"
 # ALIASES
 # --------------------------------- #
 alias ls='exa --group-directories-first'
-alias l='exa -Falh --git'
+alias l='exa -Falh'
 alias ll='l'
 alias lt='exa --tree'
 SELF="$(basename "${BASH_SOURCE}")"
@@ -40,8 +40,6 @@ alias box="draw"
 alias dcompose="docker-compose"
 alias ccat="highlight $1 --out-format xterm256 --line-numbers --quiet --force --style solarized-light"
 alias zshell="PS1='[%n] %~%% ' zsh"
-alias python="${HOME}/.pyenv/versions/3.8.0/bin/python3.8"
-alias pip="${BREW_PREFIX}/Cellar/python/3.7.6_1/bin/pip3"
 
 # --------------------------------- #
 # BASH COMPLETIONS
