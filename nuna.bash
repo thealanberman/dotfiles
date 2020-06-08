@@ -22,6 +22,7 @@ alias changepw="\${HOME}/code/changepw/changepw.py"
 alias bastion="\${HOME}/code/it-bastion-ssh-server/bastion.sh"
 alias mfa="vault-auth-aws-init"
 alias mfaidm="vault-auth-aws-init -a nuna-identity-management -r admin"
+alias cfrun="docker run cfrun"
 
 daily() {
     set -x
@@ -45,9 +46,9 @@ sandbox() {
     }
     sandbox_name="${2:-${USER}}"
     aws sts get-caller-identity &> /dev/null || { echo "ERROR: Auth first!"; return 1; }
+    sandbox_instance_id="$(aws cloudformation describe-stack-resource --stack-name CommercialSandboxStateless-"${sandbox_name}" --logical-resource-id CommercialSandboxInstance --query 'StackResourceDetail.PhysicalResourceId' --output text)"
     case "${1}" in
         status)
-            sandbox_instance_id="$(aws cloudformation describe-stack-resource --stack-name CommercialSandboxStateless-"${sandbox_name}" --logical-resource-id CommercialSandboxInstance --query 'StackResourceDetail.PhysicalResourceId' --output text)"
             echo -n "Sandbox ${sandbox_name}.sandbox.int.nunahealth.com is: "
             aws ec2 describe-instance-status --instance-ids "${sandbox_instance_id}" --query "InstanceStatuses[0].InstanceState.Name" --output text
             ;;
@@ -58,14 +59,13 @@ sandbox() {
             echo "Sandbox is now stopped."
             ;;
         start|up)
-            sandbox_instance_id="$(aws cloudformation describe-stack-resource --stack-name CommercialSandboxStateless-"${sandbox_name}" --logical-resource-id CommercialSandboxInstance --query 'StackResourceDetail.PhysicalResourceId' --output text)"
             aws ec2 start-instances --instance-ids "${sandbox_instance_id}" && \
             echo "Waiting for Sandbox ${sandbox_name}.sandbox.int.nunahealth.com to start..."
             aws ec2 wait instance-running --instance-ids "${sandbox_instance_id}" && \
             echo "Sandbox is now running."
             ;;
         connect|ssh)
-            pgrep -q ssh-agent || ssh-add
+            pgrep -q ssh-agent || ssh-yubi
             ssh -A -o ConnectTimeout=1 "${sandbox_name}.sandbox.int.nunahealth.com" \
                 || echo "ERROR: Can't reach host. Check VPN connection?"
             ;;
@@ -76,13 +76,9 @@ sandbox() {
 }
 
 # shellcheck disable=SC2120
-ssh-add() {
-    if [ -n "$1" ]; then
-        command ssh-add "${*}"
-    else
-        command ssh-add -e /usr/local/lib/opensc-pkcs11.so >/dev/null 2>&1
-        command ssh-add -s /usr/local/lib/opensc-pkcs11.so
-    fi
+ssh-yubi() {
+        ssh-add -e /usr/local/lib/opensc-pkcs11.so >/dev/null 2>&1
+        ssh-add -s /usr/local/lib/opensc-pkcs11.so
 }
 
 ssh-yubikey-pub() {

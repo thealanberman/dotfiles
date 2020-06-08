@@ -11,6 +11,11 @@ export POWERLINE_RIGHT_PROMPT="clock user_info"
 # --------------------------------- #
 export EDITOR="vim"
 
+# --------------------------------- #
+# AWS PAGER
+# --------------------------------- #
+export AWS_PAGER=""
+
 #--------------------------------- #
 # ALIASES
 # --------------------------------- #
@@ -25,7 +30,7 @@ alias dev="cd ${HOME}/code"
 alias cd..='cd ..'
 alias df='df -H'
 alias ff='fd'
-alias ytaudio="youtube-dl --ignore-errors --format m4a"
+alias yta="youtube-dl --ignore-errors --format m4a"
 alias plistbuddy='/usr/libexec/PlistBuddy'
 alias ping='ping --apple-time'
 alias now="date +%Y%m%dT%H%M%S"
@@ -36,6 +41,7 @@ alias reload="source ${HOME}/.bash_profile"
 alias ports="lsof -i -U -n -P | grep LISTEN"
 alias listening='ports'
 alias t="tmux attach || tmux new"
+alias tf="terraform"
 alias box="draw"
 alias dcompose="docker-compose"
 alias ccat="highlight $1 --out-format xterm256 --line-numbers --quiet --force --style solarized-light"
@@ -176,23 +182,23 @@ json2yaml ()
 
 yaml2json ()
 {
-    ruby -ryaml -rjson -e 'puts JSON.pretty_generate(YAML.load(ARGF))' < "${1}" > "${1}.json"
-    echo "Created ${1}.json"
+  ruby -ryaml -rjson -e 'puts JSON.pretty_generate(YAML.load(ARGF))' < "${1}" > "${1}.json"
+  echo "Created ${1}.json"
 }
 
 pinger ()
 {	
-    ping_cancelled=false    # Keep track of whether the loop was cancelled, or succeeded
-    until ping -c1 "${1}" >/dev/null 2>&1; do :; done &    # The "&" backgrounds it
-    trap "kill $!; ping_cancelled=true" SIGINT
-    wait $!          # Wait for the loop to exit, one way or another
-    trap - SIGINT    # Remove the trap, now we're done with it
-    echo "Done pinging, cancelled=${ping_cancelled}"
+  ping_cancelled=false    # Keep track of whether the loop was cancelled, or succeeded
+  until ping -c1 "${1}" >/dev/null 2>&1; do :; done &    # The "&" backgrounds it
+  trap "kill $!; ping_cancelled=true" SIGINT
+  wait $!          # Wait for the loop to exit, one way or another
+  trap - SIGINT    # Remove the trap, now we're done with it
+  echo "Done pinging, cancelled=${ping_cancelled}"
 }
 
 kh () 
 {
-    sed -i.bak -e ${1}d "${HOME}/.ssh/known_hosts"
+  sed -i.bak -e ${1}d "${HOME}/.ssh/known_hosts"
 }
 
 retry () 
@@ -214,4 +220,10 @@ retry ()
     fi
   done
   return 0
+}
+
+audio_trim ()
+{
+  [[ $2 ]] || { echo "Usage: audio_trim <file> <seconds to keep>"; return 1; }
+  ffmpeg -ss 0 -t "${2}" -i "${1}" -vn -c copy "${1%.*}_trimmed.${1##*.}"
 }
