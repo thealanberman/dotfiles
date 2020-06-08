@@ -79,13 +79,6 @@ s3cat ()
     aws s3 cp "${1}" - | cat
 }
 
-s3bat ()
-{
-    [[ -n "${1}" ]] || { echo "Usage: s3cat <full S3 URL>"; return 1; }
-    which bat > /dev/null || { echo "bat not installed"; return 1; }
-    aws s3 cp "${1}" - | bat
-}
-
 dmg ()
 {
     if [[ -d ${1} ]] && [[ -d ${2} ]]; then
@@ -108,7 +101,7 @@ cat <<EOF
 EOF
 }
 
-flatten ()
+pdf_flatten ()
 {
     [[ "$(command -v pdf2ps)" ]] || { echo "brew install ghostscript"; return 1; }
     if [[ -z "${1}" ]]; then
@@ -118,17 +111,17 @@ flatten ()
     fi
 }
 
-caps ()
+capitalize ()
 {
-    awk '{print toupper(substr($0,0,1))tolower(substr($0,2))}' <<<"${1}"
+  awk '{print toupper(substr($0,0,1))tolower(substr($0,2))}' <<<"${1}"
 }
 
-lower ()
+lowercase ()
 {
   tr '[:upper:]' '[:lower:]' <<<"${1}"
 }
 
-upper ()
+uppercase ()
 {
   tr '[:lower:]' '[:upper:]' <<<"${1}"
 }
@@ -136,48 +129,48 @@ upper ()
 # same as dd but with progress meter!
 ddprogress ()
 {
-    [[ "$(command -v pv)" ]] ||  { echo "brew install pv first"; return; }
-    [[ -e "${2}" ]] || echo "Usage: ddprogress [SOURCE] [DESTINATION]"
-    sudo pv -tpreb "${1}" | sudo dd bs=1m of="${2}"
+  [[ "$(command -v pv)" ]] ||  { echo "brew install pv first"; return; }
+  [[ -e "${2}" ]] || echo "Usage: ddprogress [SOURCE] [DESTINATION]"
+  sudo pv -tpreb "${1}" | sudo dd bs=1m of="${2}"
 }
 
 # incognito mode for shell
 incognito ()
 {
-    unset PROMPT_COMMAND;
-    export HISTFILE="/dev/null";
-    export HISTSIZE="0";
-    history -c
+  unset PROMPT_COMMAND;
+  export HISTFILE="/dev/null";
+  export HISTSIZE="0";
+  history -c
 }
 
 # (macOS) generates a qr code and opens it in Preview
-qr()
+qr ()
 {
-    [[ "$(command -v qrencode)" ]] || { echo "brew install qrencode first"; return; }
-    qrencode "${1}" -o /tmp/qrcode.png && open /tmp/qrcode.png
+  [[ "$(command -v qrencode)" ]] || { echo "brew install qrencode first"; return; }
+  qrencode "${1}" -o /tmp/qrcode.png && open /tmp/qrcode.png
 }
 
-serverhere()
+serverhere ()
 {
-    myip=$(ifconfig en0 | grep "inet " | awk -F'[: ]+' '{ print $2 }')
-    echo "point your browser to http://${myip}:8000"
-    python3 -m http.server 8000
+  myip=$(ifconfig en0 | grep "inet " | awk -F'[: ]+' '{ print $2 }')
+  echo "point your browser to http://${myip}:8000"
+  python3 -m http.server 8000
 }
 
 get_mac_address ()
 {
-    system_profiler SPNetworkDataType | awk -F" " '/MAC Address/ {print $3}'
+  system_profiler SPNetworkDataType | awk -F" " '/MAC Address/ {print $3}'
 }
 
 get_serial ()
 {
-    system_profiler SPHardwareDataType | awk -F" " '/Serial/ {print $4}'
+  system_profiler SPHardwareDataType | awk -F" " '/Serial/ {print $4}'
 }
 
 json2yaml ()
 {
-    ruby -ryaml -rjson -e 'puts YAML.dump(JSON.parse(STDIN.read))' < "${1}" > "${1}.yaml"
-    echo "Created ${1}.yaml"
+  ruby -ryaml -rjson -e 'puts YAML.dump(JSON.parse(STDIN.read))' < "${1}" > "${1}.yaml"
+  echo "Created ${1}.yaml"
 }
 
 yaml2json ()
