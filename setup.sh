@@ -60,18 +60,13 @@ install_brew_apps()
     bat \
     dc3dd \
     dockutil \
-    exa \
     fd \
     ffmpeg \
-    fselect \ # https://github.com/jhspetersson/fselect
     git \
     grep \
     highlight \
-    httpie \
     lazydocker \
-    lsd \
     jq \
-    micro \
     mtr \
     navi \
     openssh \
@@ -85,7 +80,6 @@ install_brew_apps()
     ruby \
     sd \
     shellcheck \
-    sipcalc \
     thefuck \
     tmux \
     tree \
@@ -97,19 +91,20 @@ install_brew_apps()
   fi
 }
 
+
 install_linux_apps()
 {
   # golang apps
+  go version || return
   go get -u github.com/wallix/awless
-  go get github.com/jesseduffield/lazydocker
+  go get -u github.com/jesseduffield/lazydocker
 
-  # install cargo
-  curl https://sh.rustup.rs -sSf | sh
-
-  # install rust (cargo) apps
-  # cargo install exa
-  cargo install sd
-  
+  # rust (cargo) apps
+  cargo version || return
+  cargo install bat
+  cargo install fd-find
+  cargo install ripgrep
+  cargo install sd  
 }
 
 case $(uname) in 
@@ -128,17 +123,15 @@ case $(uname) in
       git \
       docker \
       docker-compose \
-      golang-go
-      # fd-find # https://github.com/sharkdp/fd
-      # bat \ # https://github.com/sharkdp/bat
-      # ripgrep \ # https://github.com/BurntSushi/ripgrep#installation
-      # tmux \ # https://github.com/tmux/tmux
-
+      shellcheck \
+      golang-go \
+      cargo \
+      tmux
     install_bashit
     configure_vim
     install_linux_apps
     ;;
   *)
-    echo "ERROR: uname reports this OS is not Darwin or Linux. Exiting."
+    printf "ERROR: uname reports this OS is %s. Exiting." $(uname)
   ;;
 esac

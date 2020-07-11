@@ -11,6 +11,10 @@ if [[ $(go version) ]]; then
   export PATH="${GOPATH}/bin:${PATH}"
 fi
 
+if [[ $(cargo version) ]]; then
+  export PATH="${HOME}/.cargo/bin:${PATH}"
+fi
+
 # --------------------------------- #
 # https://github.com/Bash-it/bash-it/tree/master/themes/powerline-multiline
 # --------------------------------- #
@@ -71,7 +75,6 @@ fi
 # BASH COMPLETIONS
 # --------------------------------- #
 [[ "$(command -v thefuck)" ]] && { eval "$(thefuck --alias)"; }
-# [[ "$(command -v bsed)" ]] && { eval "$(register-python-argcomplete bsed)"; }
 source <(awless completion bash)
 
 # --------------------------------- #
