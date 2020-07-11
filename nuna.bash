@@ -1,14 +1,11 @@
 #!/usr/bin/env bash
 
-export PYENV_ROOT="${HOME}/.pyenv"  
-eval "$(pyenv init -)"
 export MFA_STS_DURATION=53200
 export NUNA_ROOT="${HOME}/code/analytics"
 export VAULT_ROOT="${HOME}/code/vault"
 export SSH_ENV="${HOME}/.ssh/environment"
 export ADMIN_USERNAME='alan-admin'
 export VAULT_ADDR="https://vault.int.nunahealth.com"
-export GOPATH="${HOME}/code/go"
 export CDPATH=:..:~:${NUNA_ROOT}/configs/nunahealth/aws/cloudformation:${NUNA_ROOT}/configs/nunahealth:${HOME}/code:
 
 # Terraform shared cache

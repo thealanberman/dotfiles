@@ -1,5 +1,16 @@
 #!/usr/bin/env bash
 
+if [[ -d "${HOME}/.pyenv" ]]; then
+  export PYENV_ROOT="${HOME}/.pyenv"
+  export PATH="$PYENV_ROOT/bin:$PATH"
+  eval "$(pyenv init -)"
+fi
+
+if [[ $(go version) ]]; then
+  export GOPATH="${HOME}/code/go"
+  export PATH="${GOPATH}/bin:${PATH}"
+fi
+
 # --------------------------------- #
 # https://github.com/Bash-it/bash-it/tree/master/themes/powerline-multiline
 # --------------------------------- #
@@ -16,13 +27,16 @@ export EDITOR="vim"
 # --------------------------------- #
 export AWS_PAGER=""
 
+# --------------------------------- #
+# UNAME (a.k.a OS type)
+# --------------------------------- #
+export UNAME=$(uname)
+
 #--------------------------------- #
 # ALIASES
 # --------------------------------- #
-alias ls='exa --group-directories-first'
-alias l='exa -Falh'
+alias l='ls -GhalF'
 alias ll='l'
-alias lt='exa --tree'
 SELF="$(basename "${BASH_SOURCE}")"
 alias aliases="${EDITOR} ${BASH_IT}/custom/${SELF}"
 alias sshconfig="${EDITOR} ${HOME}/.ssh/config"
@@ -31,13 +45,10 @@ alias cd..='cd ..'
 alias df='df -H'
 alias ff='fd'
 alias yta="youtube-dl --ignore-errors --format m4a"
-alias plistbuddy='/usr/libexec/PlistBuddy'
-alias ping='ping --apple-time'
 alias now="date +%Y%m%dT%H%M%S"
+alias reload="source ${HOME}/.bashrc"
 alias timestamp="now"
 alias today="date +%Y%m%d"
-alias macdown="open -a MacDown"
-alias reload="source ${HOME}/.bash_profile"
 alias ports="lsof -i -U -n -P | grep LISTEN"
 alias listening='ports'
 alias t="tmux attach || tmux new"
@@ -46,6 +57,15 @@ alias box="draw"
 alias dcompose="docker-compose"
 alias ccat="highlight $1 --out-format xterm256 --line-numbers --quiet --force --style solarized-light"
 alias zshell="PS1='[%n] %~%% ' zsh"
+
+# --------------------------------- #
+# DARWIN ALIASES
+# --------------------------------- #
+if [[ "${UNAME}" == "Darwin" ]]; then
+  alias reload="source ${HOME}/.bash_profile"
+  alias plistbuddy='/usr/libexec/PlistBuddy'
+  alias ping='ping --apple-time'
+fi
 
 # --------------------------------- #
 # BASH COMPLETIONS

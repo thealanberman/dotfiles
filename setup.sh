@@ -23,6 +23,7 @@ append_inputrc()
 
 configure_vim()
 {
+  [[ -f "${HOME}/.vimrc" ]] && { return 1; }
   mkdir -p ~/.vim/pack/default/start
   git clone https://github.com/morhetz/gruvbox.git ~/.vim/pack/default/start/gruvbox
   git clone https://github.com/sheerun/vim-polyglot ~/.vim/pack/default/start/vim-polyglot
@@ -106,7 +107,7 @@ install_linux_apps()
   curl https://sh.rustup.rs -sSf | sh
 
   # install rust (cargo) apps
-  cargo install exa
+  # cargo install exa
   cargo install sd
   
 }
@@ -127,14 +128,15 @@ case $(uname) in
       git \
       docker \
       docker-compose \
-      fd-find \ # https://github.com/sharkdp/fd
-      bat \ # https://github.com/sharkdp/bat
-      ripgrep \ # https://github.com/BurntSushi/ripgrep#installation
-      tmux \ # https://github.com/tmux/tmux
-
+      golang-go
+      # fd-find # https://github.com/sharkdp/fd
+      # bat \ # https://github.com/sharkdp/bat
+      # ripgrep \ # https://github.com/BurntSushi/ripgrep#installation
+      # tmux \ # https://github.com/tmux/tmux
 
     install_bashit
     configure_vim
+    install_linux_apps
     ;;
   *)
     echo "ERROR: uname reports this OS is not Darwin or Linux. Exiting."
