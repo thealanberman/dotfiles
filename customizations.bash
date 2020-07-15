@@ -243,3 +243,9 @@ audio_trim ()
   [[ $2 ]] || { echo "Usage: audio_trim <file> <seconds to keep>"; return 1; }
   ffmpeg -ss 0 -t "${2}" -i "${1}" -vn -c copy "${1%.*}_trimmed.${1##*.}"
 }
+
+hashafter ()
+{
+  { [[ $1 ]] && [[ $2 ]]; } || { echo "Usage: hashafter <filename> <line number>"; return 1; }
+  shasum <<<$(sed -n "${2},\$p" "${1}") | cut -d' ' -f1
+}
