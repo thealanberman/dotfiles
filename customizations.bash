@@ -6,12 +6,12 @@ if [[ -d "${HOME}/.pyenv" ]]; then
   eval "$(pyenv init -)"
 fi
 
-if [[ $(go version) ]]; then
+if [[ $(command -v go) ]]; then
   export GOPATH="${HOME}/code/go"
   export PATH="${GOPATH}/bin:${PATH}"
 fi
 
-if [[ $(cargo version) ]]; then
+if [[ $(command -v cargo) ]]; then
   export PATH="${HOME}/.cargo/bin:${PATH}"
 fi
 
