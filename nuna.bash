@@ -20,6 +20,7 @@ alias bastion="\${HOME}/code/it-bastion-ssh-server/bastion.sh"
 alias mfa="vault-auth-aws-init"
 alias mfaidm="vault-auth-aws-init -a nuna-identity-management -r admin"
 alias cfrun="docker run cfrun"
+alias ecr-login="aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 254566265011.dkr.ecr.us-west-2.amazonaws.com"
 
 daily() {
     set -x
