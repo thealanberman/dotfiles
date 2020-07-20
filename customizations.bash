@@ -249,3 +249,10 @@ hashafter ()
   { [[ $1 ]] && [[ $2 ]]; } || { echo "Usage: hashafter <filename> <line number>"; return 1; }
   shasum <<<$(sed -n "${2},\$p" "${1}") | cut -d' ' -f1
 }
+
+ramdisk()
+{
+  [[ $1 ]] || { echo "Usage: ramdisk <megabytes>"; return 1; }
+  ramdisk_size=$((${1}*2048))
+  diskutil erasevolume HFS+ 'RAMDisk' $(hdiutil attach -nobrowse -nomount ram://${ramdisk_size})
+}
