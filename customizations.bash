@@ -259,8 +259,3 @@ ramdisk()
   ramdisk_size=$((${1}*2048))
   diskutil erasevolume HFS+ 'RAMDisk' $(hdiutil attach -nobrowse -nomount ram://${ramdisk_size})
 }
-
-gif2mp4()
-{
-  ffmpeg -r 30 "${1}" -movflags faststart -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" "${1}.mp4"
-}
