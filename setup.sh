@@ -67,8 +67,8 @@ install_brew_apps()
     highlight \
     lazydocker \
     jq \
+    kakoune \
     mtr \
-    navi \
     openssh \
     openssl \
     pipx \
@@ -80,6 +80,8 @@ install_brew_apps()
     ruby \
     sd \
     shellcheck \
+    starship \
+    tfenv \
     thefuck \
     tmux \
     tree \
@@ -87,7 +89,8 @@ install_brew_apps()
     vim \
     wget \
     youtube-dl \
-    yq
+    yq \
+    z
   fi
 }
 
