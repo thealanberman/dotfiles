@@ -86,6 +86,11 @@ source <(awless completion bash)
 export DOCKER_BUILDKIT=1
 
 # --------------------------------- #
+# STARSHIP INIT
+# --------------------------------- #
+eval "$(starship init bash)"
+
+# --------------------------------- #
 # PRETTIER XTRACE OUTPUT
 # --------------------------------- #
 export PS4='\e[2m+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }\e[0m'
