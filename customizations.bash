@@ -62,6 +62,9 @@ alias dcompose="docker-compose"
 alias ccat="highlight $1 --out-format xterm256 --line-numbers --quiet --force --style solarized-light"
 alias zshell="PS1='[%n] %~%% ' zsh"
 
+# initialize z shortcut, if installed
+[[ -f /usr/local/etc/profile.d/z.sh ]] && source /usr/local/etc/profile.d/z.sh
+
 # --------------------------------- #
 # DARWIN ALIASES
 # --------------------------------- #
