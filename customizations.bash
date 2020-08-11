@@ -259,3 +259,13 @@ ramdisk()
   ramdisk_size=$((${1}*2048))
   diskutil erasevolume HFS+ 'RAMDisk' $(hdiutil attach -nobrowse -nomount ram://${ramdisk_size})
 }
+
+splay()
+{
+  [[ $1 ]] || { echo "Usage: splay <seconds> <command>"; return 1; }
+  local seconds=$((RANDOM % ${1}))
+  sleep ${seconds}
+  shift
+  eval "${@}"
+}
+
