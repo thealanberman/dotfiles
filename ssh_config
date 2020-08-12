@@ -1,0 +1,21 @@
+Host github
+    Hostname github.com
+    User git
+    PubKeyAuthentication yes
+    UseKeychain yes
+    AddKeysToAgent yes
+    IdentityFile ~/.ssh/github_rsa
+
+Host github-skull
+    Hostname github.com
+    User git
+    PubKeyAuthentication yes
+    IdentityFile ~/.ssh/github_skull_rsa
+
+Host okaymay.be
+    User bitnami
+    PubKeyAuthentication yes
+    IdentityFile ~/.ssh/bitnami-Hi70X2s.pem
+
+ServerAliveInterval 30
+LogLevel QUIET
