@@ -247,6 +247,16 @@ audio_trim ()
   ffmpeg -ss 0 -t "${2}" -i "${1}" -vn -c copy "${1%.*}_trimmed.${1##*.}"
 }
 
+audio_join()
+{
+  [[ ${3} ]] || { echo "Usage: audio_join <file1> <file2> <output>"; return 1; }
+  local pwd=$(pwd)
+  echo "file \"${pwd}/${1}\"" > /tmp/list.txt
+  echo "file \"${pwd}/${2}\"" >> /tmp/list.txt
+  ffmpeg -f concat -safe 0 -i /tmp/list.txt -c copy "${pwd}/${3}"
+  rm /tmp/list.txt
+}
+
 hashafter ()
 {
   { [[ $1 ]] && [[ $2 ]]; } || { echo "Usage: hashafter <filename> <line number>"; return 1; }
@@ -268,4 +278,3 @@ splay()
   shift
   eval "${@}"
 }
-
