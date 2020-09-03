@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 export MFA_STS_DURATION=53200
 export NUNA_ROOT="${HOME}/code/analytics"
 export VAULT_ROOT="${HOME}/code/vault"
@@ -12,7 +11,6 @@ export CDPATH=:..:~:${NUNA_ROOT}/configs/nunahealth/aws/cloudformation:${NUNA_RO
 # See: https://www.terraform.io/docs/configuration/providers.html#provider-plugin-cache
 export TF_PLUGIN_CACHE_DIR="${HOME}/.terraform.d/plugin-cache"
 
-alias nuna="/usr/local/bin/code \${BASH_IT}/custom/nuna.bash"
 alias analytics="cd \${NUNA_ROOT}"
 alias deployments="cd \${NUNA_ROOT}/configs/nunahealth/aws/cloudformation/deployments"
 alias changepw="\${HOME}/code/changepw/changepw.py"
@@ -34,7 +32,9 @@ daily() {
     set +x
 }
 
-
+nuna() {
+  which -s code || "${EDITOR}" "${BASH_IT}/custom/nuna.bash" && code "${BASH_IT}/custom/nuna.bash"
+}
 
 sandbox() {
     sandbox_help() {
@@ -75,54 +75,54 @@ sandbox() {
 
 # shellcheck disable=SC2120
 ssh-yubi() {
-        ssh-add -e /usr/local/lib/opensc-pkcs11.so >/dev/null 2>&1
-        ssh-add -s /usr/local/lib/opensc-pkcs11.so
+  ssh-add -e /usr/local/lib/opensc-pkcs11.so >/dev/null 2>&1
+  ssh-add -s /usr/local/lib/opensc-pkcs11.so
 }
 
 ssh-yubikey-pub() {
-    ssh-keygen -D /usr/local/lib/opensc-pkcs11.so -e
+  ssh-keygen -D /usr/local/lib/opensc-pkcs11.so -e
 }
 
 instance() {
-    instancehelp() {
-        printf "USAGE:\n\t"
-        printf "instance search <name or partial name>\n\t"
-        printf "instance ami <name or partial name>\n\t"
-        printf "instance ssh <name or private IP>\n\t"
-        printf "instance ssh <service> <tier>\n"
-    }
-    case "${1}" in
-        search)
-            awless list instances --filter name="${2}"
-            ;;
-        ssh)
-            [[ "${2}" ]] || { instancehelp; return 1; }
-            [[ "${3}" ]] && role="role=${2}-${3}" || role="foo"
-            local i
-            i=$(awless list instances --filter name="${2}" --tag "${role}" --columns name --no-headers --format csv)
-            awless ssh --private "${USER}@${i}"
-            ;;
-        ami)
-            local instance_id
-            instance_id=$(awless list instances --filter name="${2}" --ids | grep '^i-')
-            aws ec2 describe-instances --instance-ids "${instance_id}" \
-                --query "Reservations[0].Instances[0].ImageId" \
-                --output text
-            ;;
-        *)
-            instancehelp
-            ;;
-    esac
+  instancehelp() {
+    printf "USAGE:\n\t"
+    printf "instance search <name or partial name>\n\t"
+    printf "instance ami <name or partial name>\n\t"
+    printf "instance ssh <name or private IP>\n\t"
+    printf "instance ssh <service> <tier>\n"
+  }
+  case "${1}" in
+    search)
+      awless list instances --filter name="${2}"
+      ;;
+    ssh)
+      [[ "${2}" ]] || { instancehelp; return 1; }
+      [[ "${3}" ]] && role="role=${2}-${3}" || role="foo"
+      local i
+      i=$(awless list instances --filter name="${2}" --tag "${role}" --columns name --no-headers --format csv)
+      awless ssh --private "${USER}@${i}"
+      ;;
+    ami)
+      local instance_id
+      instance_id=$(awless list instances --filter name="${2}" --ids | grep '^i-')
+      aws ec2 describe-instances --instance-ids "${instance_id}" \
+        --query "Reservations[0].Instances[0].ImageId" \
+        --output text
+      ;;
+    *)
+      instancehelp
+      ;;
+  esac
 }
 
 stack() {
-    stackhelp() {
-            printf "USAGE:\n\t"
-            printf "stack search <search term>\n\t"
-            printf "stack info <stack name>\n\t"
-            printf "stack ami <stack name>\n\t"
-            printf "stack delete <stack name>\n"
-    }
+  stackhelp() {
+    printf "USAGE:\n\t"
+    printf "stack search <search term>\n\t"
+    printf "stack info <stack name>\n\t"
+    printf "stack ami <stack name>\n\t"
+    printf "stack delete <stack name>\n"
+  }
     [ -z "${2}" ] && { stackhelp; return 1; }
     case "${1}" in
         delete)
@@ -140,48 +140,48 @@ stack() {
                 --query "Stacks[0].Parameters[?ParameterKey=='ImageId'].ParameterValue" \
                 --output text
             ;;
-        info|show|status)
-            awless show "${2}"
-            ;;
-        *)
-            stackhelp
-            ;;
-    esac
+    info | show | status)
+      awless show "${2}"
+      ;;
+    *)
+      stackhelp
+      ;;
+  esac
 }
 
 newscript() {
-    cp "${HOME}/main.sh" "${1:-main.sh}" && echo "${1:-main.sh} created."
+  cp "${HOME}/main.sh" "${1:-main.sh}" && echo "${1:-main.sh} created."
 }
 
 initlog() {
-    if [[ -z "${1}" ]]; then
-        printf "ABOUT\n"
-        printf "\tDisplays the latest cloud init log for a service + tier.\n"
-        printf "USAGE\n"
-        printf "\tinitlog <service> <tier> [optional: subrole]\n"
-        return 1
-    fi
-    aws sts get-caller-identity &> /dev/null || { echo "ERROR: Auth first!"; return 1; }
-    local latestlog
-    if [[ -z "${3:-}" ]]; then
-        latestlog=$(aws s3 ls "s3://nunahealth-conf/status/${1}/${2}/" | tail -n1 | awk '{print $4}')
-        aws s3 cp "s3://nunahealth-conf/status/${1}/${2}/${latestlog}" - | cat
-    else
-        latestlog=$(aws s3 ls "s3://nunahealth-conf/status/${1}/$3/${2}/" | tail -n1 | awk '{print $4}')
-        aws s3 cp "s3://nunahealth-conf/status/${1}/${3}/${2}/${latestlog}" - | cat
-    fi
+  if [[ -z "${1}" ]]; then
+    printf "ABOUT\n"
+    printf "\tDisplays the latest cloud init log for a service + tier.\n"
+    printf "USAGE\n"
+    printf "\tinitlog <service> <tier> [optional: subrole]\n"
+    return 1
+  fi
+  aws sts get-caller-identity &> /dev/null || { echo "ERROR: Auth first!"; return 1; }
+  local latestlog
+  if [[ -z "${3:-}" ]]; then
+      latestlog=$(aws s3 ls "s3://nunahealth-conf/status/${1}/${2}/" | tail -n1 | awk '{print $4}')
+      aws s3 cp "s3://nunahealth-conf/status/${1}/${2}/${latestlog}" - | cat
+  else
+      latestlog=$(aws s3 ls "s3://nunahealth-conf/status/${1}/$3/${2}/" | tail -n1 | awk '{print $4}')
+      aws s3 cp "s3://nunahealth-conf/status/${1}/${3}/${2}/${latestlog}" - | cat
+  fi
 }
 
 # Called as `prompw prod` this fetches the prod password from vault and puts it in your Mac's clipboard
 prompw () {
-    aws sts get-caller-identity > /dev/null 2>&1 || { echo "ERROR: 'vault-auth-aws.sh' first!"; return 1; }
-    [[ "${1}" == "dev" || "${1}" == "prod" ]] || { echo "ERROR: must specify 'dev' or 'prod'"; return 1; }
-    vault read -field=value "nuna/${1}/prometheus/http/password" | pbcopy && echo "clipboarded"
+  aws sts get-caller-identity > /dev/null 2>&1 || { echo "ERROR: 'vault-auth-aws.sh' first!"; return 1; }
+  [[ "${1}" == "dev" || "${1}" == "prod" ]] || { echo "ERROR: must specify 'dev' or 'prod'"; return 1; }
+  vault read -field=value "nuna/${1}/prometheus/http/password" | pbcopy && echo "clipboarded"
 }
 
 rds () {
-    local role="${1}"
-    local tier="${2}"
-    [[ -z ${role} || -z ${tier} ]] && { echo "USAGE: rds <service> <tier>"; return 1; }
-    dig "rds-${role}-${tier}.int.nunahealth.com" CNAME +short @10.8.0.2 | sed 's,\..*,,'
+  local role="${1}"
+  local tier="${2}"
+  [[ -z ${role} || -z ${tier} ]] && { echo "USAGE: rds <service> <tier>"; return 1; }
+  dig "rds-${role}-${tier}.int.nunahealth.com" CNAME +short @10.8.0.2 | sed 's,\..*,,'
 }
