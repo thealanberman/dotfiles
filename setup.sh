@@ -127,6 +127,7 @@ case $(uname) in
     install_brew_apps
     install_bashit
     configure_vim
+    macos_symlinks
     ;;
   Linux)
     append_inputrc
@@ -142,6 +143,7 @@ case $(uname) in
     install_bashit
     configure_vim
     install_linux_apps
+    linux_symlinks
     ;;
   *)
     printf "ERROR: uname reports this OS is %s. Exiting." $(uname)
