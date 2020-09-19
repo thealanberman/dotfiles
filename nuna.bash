@@ -185,3 +185,11 @@ rds () {
   [[ -z ${role} || -z ${tier} ]] && { echo "USAGE: rds <service> <tier>"; return 1; }
   dig "rds-${role}-${tier}.int.nunahealth.com" CNAME +short @10.8.0.2 | sed 's,\..*,,'
 }
+
+vstaging() {
+  local pass=$(lpass show --password vault.staging.nuna.health)
+  export VAULT_ADDR="https://vault.staging.nuna.health"
+  vault login -method=userpass username="${USER}"
+  sleep 1
+  yes "${pass}"
+}

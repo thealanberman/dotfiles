@@ -54,7 +54,7 @@ alias today="date +%Y%m%d"
 alias ports="lsof -i -U -n -P | grep LISTEN"
 alias listening='ports'
 alias t="tmux attach || tmux new"
-alias tf="terraform -no-color"
+alias tf="terraform"
 alias box="draw"
 alias dcompose="docker-compose"
 alias ccat="highlight $1 --out-format xterm256 --line-numbers --quiet --force --style solarized-light"
@@ -83,6 +83,11 @@ source <(awless completion bash)
 # SPEED UP DOCKER BUILDS
 # --------------------------------- #
 export DOCKER_BUILDKIT=1
+
+# --------------------------------- #
+# TERRAFORM
+# --------------------------------- #
+export TF_CLI_ARGS="-no-color"
 
 # --------------------------------- #
 # PRETTIER XTRACE OUTPUT

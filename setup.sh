@@ -21,13 +21,23 @@ append_inputrc()
   fi
 }
 
+macos_symlinks()
+{
+  ln -s "${CWD}/my.cheat" "${HOME}/Library/Application Support/navi/cheats/"
+}
+
+linux_symlinks()
+{
+  ln -s "${CWD}/my.cheat" "${HOME}/.local/share/navi/cheats/"
+}
+
 configure_vim()
 {
   [[ -f "${HOME}/.vimrc" ]] && { return 1; }
-  mkdir -p ~/.vim/pack/default/start
-  git clone https://github.com/morhetz/gruvbox.git ~/.vim/pack/default/start/gruvbox
-  git clone https://github.com/sheerun/vim-polyglot ~/.vim/pack/default/start/vim-polyglot
-  ln -s "${CWD}"/.vimrc ~/.vimrc
+  mkdir -p "${HOME}/.vim/pack/default/start"
+  git clone https://github.com/morhetz/gruvbox.git "${HOME}/.vim/pack/default/start/gruvbox"
+  git clone https://github.com/sheerun/vim-polyglot "${HOME}/.vim/pack/default/start/vim-polyglot"
+  ln -s "${CWD}/.vimrc" "${HOME}/.vimrc"
 }
 
 install_bashit() 
@@ -55,7 +65,6 @@ install_brew_apps()
   if [[ "${REPLY}" =~ ^[Yy]$ ]]; then
     brew install \
     awless \
-    awscli \
     bash \
     bat \
     dc3dd \
@@ -63,12 +72,13 @@ install_brew_apps()
     fd \
     ffmpeg \
     git \
+    golang \
     grep \
     highlight \
     lazydocker \
     jq \
-    kakoune \
     mtr \
+    navi \
     openssh \
     openssl \
     pipx \
@@ -80,12 +90,10 @@ install_brew_apps()
     ruby \
     sd \
     shellcheck \
-    starship \
     tfenv \
     thefuck \
     tmux \
     tree \
-    usql \
     vim \
     wget \
     youtube-dl \
@@ -106,8 +114,9 @@ install_linux_apps()
   cargo version || return
   cargo install bat
   cargo install fd-find
+  cargo install navi
   cargo install ripgrep
-  cargo install sd  
+  cargo install sd
 }
 
 case $(uname) in 
