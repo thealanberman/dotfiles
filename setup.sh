@@ -16,8 +16,8 @@ CWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 append_inputrc()
 {
-  if ! grep "completion-ignore-case" ~/.inputrc &> /dev/null; then
-    printf "set completion-ignore-case On" >> ~/.inputrc
+  if ! grep -q "completion-ignore-case" ~/.inputrc; then
+    cp .inputrc ~
   fi
 }
 
