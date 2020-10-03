@@ -173,12 +173,6 @@ install_linux_apps()
   }
 }
 
-set_bashit_theme()
-{
-  sd 'bobby' 'powerline' ~/.bashrc 2>/dev/null
-  sd 'bobby' 'powerline' ~/.bash_profile 2>/dev/null
-}
-
 case $(uname) in 
   Darwin)
     append_inputrc
@@ -188,8 +182,8 @@ case $(uname) in
     install_bashit
     configure_vim
     macos_symlinks
-    set_bashit_theme
-    source ~/.bash_profile
+    sd 'bobby' 'powerline' ~/.bash_profile 2>/dev/null
+    echo "REMEMBER: source ~/.bash_profile"
     ;;
   Linux)
     append_inputrc
@@ -206,8 +200,8 @@ case $(uname) in
     configure_vim
     linux_symlinks
     install_linux_apps
-    set_bashit_theme
-    source ~/.bashrc
+    sd 'bobby' 'powerline' ~/.bashrc 2>/dev/null
+    echo "REMEMBER: source ~/.bashrc"
     ;;
   *)
     printf "ERROR: uname reports this OS is %s. Exiting." "$(uname)"
