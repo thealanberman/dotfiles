@@ -164,6 +164,7 @@ install_linux_apps()
   which sd || {
     version=$(get_latest_version https://github.com/chmln/sd)
     sudo curl -sL "https://github.com/chmln/sd/releases/download/v${version}/sd-v${version}-x86_64-unknown-linux-musl" -o /usr/local/bin/sd
+    sudo chmod +x /usr/local/bin/sd
   }
   
   which navi || {
