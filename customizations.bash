@@ -6,9 +6,13 @@ if [[ -d "${HOME}/.pyenv" ]]; then
   eval "$(pyenv init -)"
 fi
 
-if [[ $(command -v go) ]]; then
-  export GOPATH="${HOME}/code/go"
-  export PATH="${GOPATH}/bin:${PATH}"
+if [[ ! "${GOPATH}" ]]; then
+  if [[ -d "${HOME}/code/go" ]]; then
+    export GOPATH="${HOME}/code/go"
+  else
+    export GOPATH="${HOME}/go"
+  fi
+  export PATH="${PATH}:${GOPATH}/bin"
 fi
 
 if [[ $(command -v cargo) ]]; then
@@ -48,7 +52,7 @@ alias df='df -H'
 alias ff='fd'
 alias yta="youtube-dl --ignore-errors --yes-playlist --format m4a"
 alias now="date +%Y%m%dT%H%M%S"
-alias reload="source ${HOME}/.bashrc"
+alias reload="source ~/.bashrc"
 alias timestamp="now"
 alias today="date +%Y%m%d"
 alias ports="lsof -i -U -n -P | grep LISTEN"
@@ -68,7 +72,7 @@ alias tips="tldr"
 # DARWIN ALIASES
 # --------------------------------- #
 if [[ "${UNAME}" == "Darwin" ]]; then
-  alias reload="source ${HOME}/.bash_profile"
+  alias reload="source ~/.bash_profile"
   alias plistbuddy='/usr/libexec/PlistBuddy'
   alias ping='ping --apple-time'
 fi
@@ -76,8 +80,8 @@ fi
 # --------------------------------- #
 # BASH COMPLETIONS
 # --------------------------------- #
-[[ "$(command -v thefuck)" ]] && { eval "$(thefuck --alias)"; }
-source <(awless completion bash)
+which thefuck >/dev/null && source <(thefuck --alias)
+which awless >/dev/null && source <(awless completion bash)
 
 # --------------------------------- #
 # SPEED UP DOCKER BUILDS

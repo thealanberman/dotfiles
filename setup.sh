@@ -9,31 +9,46 @@ set -o nounset # set -u
 # Catch the error in case 1st command fails but piped command succeeds
 set -o pipefail
 # Turn on traces, useful while debugging
-set -o xtrace # set -x
+# set -o xtrace # set -x
 
 # get current working directory
 CWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 append_inputrc()
 {
-  if ! grep -q "completion-ignore-case" ~/.inputrc; then
-    cp .inputrc ~
+  if ! grep -q "history-search-forward" "${HOME}/.inputrc"; then
+    cp "${CWD}/.inputrc" "${HOME}"
   fi
 }
 
 macos_symlinks()
 {
-  ln -s "${CWD}/my.cheat" "${HOME}/Library/Application Support/navi/cheats/"
+  echo "[ Making Symlinks ]"
+  mkdir -p \
+    "${HOME}/Library/Application Support/navi/cheats"
+    "${HOME}/.bash-it/custom/"
+
+  ln -fs "${CWD}/my.cheat" "${HOME}/Library/Application Support/navi/cheats/"
+  ln -fs "${CWD}/customizations.bash" "${HOME}/.bash-it/custom/"
+  ln -fs "${CWD}/nuna.bash" "${HOME}/.bash-it/custom/"
 }
 
 linux_symlinks()
 {
-  ln -s "${CWD}/my.cheat" "${HOME}/.local/share/navi/cheats/"
+  echo "[ Making Symlinks ]"
+  mkdir -p \
+    "${HOME}/.local/share/navi/cheats" \
+    "${HOME}/.bash-it/custom/"
+  
+  ln -fs "${CWD}/my.cheat" "${HOME}/.local/share/navi/cheats/"
+  ln -fs "${CWD}/customizations.bash" "${HOME}/.bash-it/custom/"
+  ln -fs "${CWD}/nuna.bash" "${HOME}/.bash-it/custom/"
 }
 
 configure_vim()
 {
-  [[ -f "${HOME}/.vimrc" ]] && { return 1; }
+  echo "[ Configuring Vim ]"
+  [[ -f "${HOME}/.vimrc" ]] && return
   mkdir -p "${HOME}/.vim/pack/default/start"
   git clone https://github.com/morhetz/gruvbox.git "${HOME}/.vim/pack/default/start/gruvbox"
   git clone https://github.com/sheerun/vim-polyglot "${HOME}/.vim/pack/default/start/vim-polyglot"
@@ -42,17 +57,25 @@ configure_vim()
 
 install_bashit() 
 {
+  echo "[ Installing Bash-It ]"
   # can't install bash-it without git
   git --version || return 
   read -e -s -p "Install Bash-it [y/N]? " -n 1 -r
   if [[ "${REPLY}" =~ ^[Yy]$ ]]; then
-    /usr/bin/git clone --depth=1 https://github.com/Bash-it/bash-it.git ~/.bash-it
-    eval ~/.bash-it/install.sh --silent --no-modify-config
+    if [[ -d "${HOME}/.bash-it" ]]; then
+      pushd "${HOME}/.bash-it"
+      git pull
+      popd
+    else
+      /usr/bin/git clone --depth=1 https://github.com/Bash-it/bash-it.git "${HOME}/.bash-it"
+      eval "${HOME}/.bash-it/install.sh" --silent
+    fi
   fi
 }
 
 install_homebrew()
 {
+  echo "[ Installing Homebrew ]"
   read -e -s -p "Install Homebrew [y/N]? " -n 1 -r
   if [[ "${REPLY}" =~ ^[Yy]$ ]]; then
     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
@@ -102,21 +125,52 @@ install_brew_apps()
   fi
 }
 
+get_latest_version()
+{
+  curl --silent "${1}/releases/latest" | grep -Eo '[0-9]+.[0-9]+.[0-9]+'
+}
 
 install_linux_apps()
 {
-  # golang apps
-  go version || return
-  go get -u github.com/wallix/awless
-  go get -u github.com/jesseduffield/lazydocker
+  echo "[ Installing apps ]"
 
-  # rust (cargo) apps
-  cargo version || return
-  cargo install bat
-  cargo install fd-find
-  cargo install navi
-  cargo install ripgrep
-  cargo install sd
+  # golang apps
+  mkdir -p "${HOME}/code/go"
+  export GOPATH="${HOME}/code/go"
+  go version >/dev/null || return
+  PATH="${PATH}:${HOME}/code/go/bin"
+  which awless || go get -u github.com/wallix/awless
+  which lazydocker || go get -u github.com/jesseduffield/lazydocker
+
+  local version
+  which bat || {
+    version=$(get_latest_version https://github.com/sharkdp/bat)
+    curl -sL "https://github.com/sharkdp/bat/releases/download/v${version}/bat-musl_${version}_amd64.deb" -o /tmp/bat.deb
+    sudo dpkg -i /tmp/bat.deb
+  }
+  
+  which fd || {
+    version=$(get_latest_version https://github.com/sharkdp/fd)
+    curl -sL "https://github.com/sharkdp/fd/releases/download/v${version}/fd-musl_${version}_amd64.deb" -o /tmp/fd.deb
+    sudo dpkg -i /tmp/fd.deb
+  }
+
+  which rg || {
+    version=$(get_latest_version https://github.com/BurntSushi/ripgrep)
+    curl -sL "https://github.com/BurntSushi/ripgrep/releases/download/${version}/ripgrep_${version}_amd64.deb" -o /tmp/rg.deb
+    sudo dpkg -i /tmp/rg.deb
+  }
+
+  which sd || {
+    version=$(get_latest_version https://github.com/chmln/sd)
+    sudo curl -sL "https://github.com/chmln/sd/releases/download/v${version}/sd-v${version}-x86_64-unknown-linux-musl" -o /usr/local/bin/sd
+    sudo chmod +x /usr/local/bin/sd
+  }
+  
+  which navi || {
+    curl -sL https://raw.githubusercontent.com/denisidoro/navi/master/scripts/install | sudo /bin/bash
+    navi repo add denisidoro/navi-tldr-pages
+  }
 }
 
 case $(uname) in 
@@ -128,6 +182,8 @@ case $(uname) in
     install_bashit
     configure_vim
     macos_symlinks
+    sd 'bobby' 'powerline' ~/.bash_profile 2>/dev/null
+    echo "REMEMBER: source ~/.bash_profile"
     ;;
   Linux)
     append_inputrc
@@ -136,16 +192,18 @@ case $(uname) in
       git \
       docker \
       docker-compose \
+      fzf \
       shellcheck \
       golang-go \
-      cargo \
       tmux
     install_bashit
     configure_vim
-    install_linux_apps
     linux_symlinks
+    install_linux_apps
+    sd 'bobby' 'powerline' ~/.bashrc 2>/dev/null
+    echo "REMEMBER: source ~/.bashrc"
     ;;
   *)
-    printf "ERROR: uname reports this OS is %s. Exiting." $(uname)
+    printf "ERROR: uname reports this OS is %s. Exiting." "$(uname)"
   ;;
 esac
