@@ -46,7 +46,7 @@ alias dev="cd ${HOME}/code"
 alias cd..='cd ..'
 alias df='df -H'
 alias ff='fd'
-alias yta="youtube-dl --ignore-errors --format m4a"
+alias yta="youtube-dl --ignore-errors --yes-playlist --format m4a"
 alias now="date +%Y%m%dT%H%M%S"
 alias reload="source ${HOME}/.bashrc"
 alias timestamp="now"
@@ -293,4 +293,20 @@ splay() {
   sleep ${seconds}
   shift
   eval "${@}"
+}
+
+loop() {
+  while true; do
+    $1
+  done
+}
+
+a2v() {
+  [[ $1 ]] || { echo "USAGE: a2v <image file> <audio file>"; return 1; }
+  outfile=$(basename "${2}" | tr -d " ")
+  ffmpeg -r 1 -loop 1 \
+  -i "${1}" \
+  -i "${2}" \
+  -acodec copy -r 1 -shortest \
+  "${outfile%.*}.mp4"
 }
