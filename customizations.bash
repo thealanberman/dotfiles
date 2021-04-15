@@ -314,3 +314,10 @@ a2v() {
   -acodec copy -r 1 -shortest \
   "${outfile%.*}.mp4"
 }
+
+vaxcheck() {
+  while true; do
+    http https://vax.sccgov.org/ --check-status -q && { say available; echo "$(timestamp) available"; } || { echo "$(timestamp) not yet"; }
+    sleep 60
+  done
+}

@@ -5,6 +5,7 @@ export VAULT_ROOT="${HOME}/code/vault"
 export SSH_ENV="${HOME}/.ssh/environment"
 export ADMIN_USERNAME='alan-admin'
 export CDPATH=:..:~:${NUNA_ROOT}/configs/nunahealth/aws/cloudformation:${NUNA_ROOT}/configs/nunahealth:${HOME}/code:
+export NUNA_MFA_METHOD=token
 
 # Terraform shared cache
 # See: https://www.terraform.io/docs/configuration/providers.html#provider-plugin-cache
@@ -18,6 +19,7 @@ alias mfaidm="vault-auth-aws-init -a nuna-identity-management -r admin"
 alias ws="ssh -A alan.ws.int.nunahealth.com"
 alias cfrun="docker run cfrun"
 alias ecr-login="aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 254566265011.dkr.ecr.us-west-2.amazonaws.com"
+alias na="nuna_access"
 
 ### VAULT THINGS
 export VAULT_ADDR=${VAULT_ADDR:-https://vault.int.nunahealth.com}
