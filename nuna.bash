@@ -148,7 +148,7 @@ instance() {
         --output text
       ;;
     delete)
-      awless delete instance ids="${1}"
+      awless delete instance ids="${2}"
       ;;
     *)
       instancehelp
