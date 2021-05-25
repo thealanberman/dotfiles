@@ -26,13 +26,14 @@ export VAULT_ADDR=${VAULT_ADDR:-https://vault.int.nunahealth.com}
 alias vth="vault-token-helper"
 
 vault-login() {
-  vault login -method=ldap username=${1:-$USER} passcode="$(read -rp 'Yubikey tap: ' && echo ${REPLY})"
+  vault login -method=ldap username="${1:-$USER}" passcode="$(read -rp 'Yubikey tap: ' && echo ${REPLY})"
 }
 
 daily() {
-  VAULT_ADDR=https://vault.int.nunahealth.com vault login -method=ldap username=${1:-$USER} passcode="$(read -rp 'Yubikey tap: ' && echo ${REPLY})"
-  VAULT_ADDR=https://vault.staging.nuna.health vault login -method=ldap username=${1:-$USER} passcode="$(read -rp 'Yubikey tap: ' && echo ${REPLY})"
-  VAULT_ADDR=https://vault.nuna.health vault login -method=ldap username=${1:-$USER} passcode="$(read -rp 'Yubikey tap: ' && echo ${REPLY})"
+  nuna_access login
+  VAULT_ADDR=https://vault.int.nunahealth.com vault login -method=ldap username="${1:-$USER}" passcode="$(read -rp 'Yubikey tap: ' && echo ${REPLY})"
+  VAULT_ADDR=https://vault.staging.nuna.health vault login -method=ldap username="${1:-$USER}" passcode="$(read -rp 'Yubikey tap: ' && echo ${REPLY})"
+  VAULT_ADDR=https://vault.nuna.health vault login -method=ldap username="${1:-$USER}" passcode="$(read -rp 'Yubikey tap: ' && echo ${REPLY})"
 }
 
 ec2user() {
@@ -117,16 +118,6 @@ sandbox() {
             sandbox_help
             ;;
     esac
-}
-
-# shellcheck disable=SC2120
-ssh-yubi() {
-  ssh-add -e /usr/local/lib/opensc-pkcs11.so >/dev/null 2>&1
-  ssh-add -s /usr/local/lib/opensc-pkcs11.so
-}
-
-ssh-yubikey-pub() {
-  ssh-keygen -D /usr/local/lib/opensc-pkcs11.so -e
 }
 
 instance() {

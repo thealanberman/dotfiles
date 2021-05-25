@@ -41,6 +41,12 @@ export AWS_PAGER=""
 export UNAME=$(uname)
 
 #--------------------------------- #
+# spotify_dl credentials
+#--------------------------------- #
+export SPOTIPY_CLIENT_ID='bb7478506cff4052b7f9b4bec2669f93'
+export SPOTIPY_CLIENT_SECRET='1ca82f92eff145b996e80004463ff18b'
+
+#--------------------------------- #
 # ALIASES
 # --------------------------------- #
 alias l='ls -GhalF'
@@ -257,6 +263,14 @@ audio_trim() {
     return 1
   }
   ffmpeg -ss 0 -t "${2}" -i "${1}" -vn -c copy "${1%.*}_trimmed.${1##*.}"
+}
+
+audio_selection() {
+  [[ $2 ]] || {
+    echo "Usage: audio_selection <file> <HH:MM:SS> <HH:MM:SS>"
+    return 1
+  }
+  ffmpeg -i "${1}" -ss "${2}" -to "${3}" -c copy "${1%.*}_selection.${1##*.}"
 }
 
 audio_join() {
