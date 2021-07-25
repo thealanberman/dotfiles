@@ -27,10 +27,9 @@ fi
 [[ -s "$HOME/.local/share/marker/marker.sh" ]] && source "$HOME/.local/share/marker/marker.sh"
 
 # --------------------------------- #
-# https://github.com/Bash-it/bash-it/tree/master/themes/powerline-multiline
+# DOTFILES
 # --------------------------------- #
-export POWERLINE_LEFT_PROMPT="hostname scm terraform cwd"
-export POWERLINE_RIGHT_PROMPT="clock user_info"
+export DOTFILES="${HOME}/code/dotfiles"
 
 # --------------------------------- #
 # EDITOR
@@ -121,7 +120,7 @@ export LESS=" -R"
 # FUNCTIONS
 # --------------------------------- #
 aliases() {
-  which -s code || "${EDITOR}" "${BASH_IT}/custom/customizations.bash" && code "${BASH_IT}/custom/customizations.bash"
+  which -s code || "${EDITOR}" "${DOTFILES}/customizations.bash" && code "${DOTFILES}/customizations.bash"
 }
 
 s3cat() {

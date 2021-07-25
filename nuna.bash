@@ -33,7 +33,7 @@ daily() {
 }
 
 nuna() {
-  which -s code || "${EDITOR}" "${BASH_IT}/custom/nuna.bash" && code "${BASH_IT}/custom/nuna.bash"
+  which -s code || "${EDITOR}" "${DOTFILES}/nuna.bash" && code "${DOTFILES}/nuna.bash"
 }
 
 sandbox() {

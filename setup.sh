@@ -24,57 +24,25 @@ append_inputrc()
 macos_symlinks()
 {
   echo "[ Making Symlinks ]"
-  mkdir -p \
-    "${HOME}/Library/Application Support/navi/cheats" \
-    "${HOME}/.bash-it/custom" \
-    "${HOME}/.config"
-
-  ln -fs "${CWD}/my.cheat" "${HOME}/Library/Application Support/navi/cheats/"
-  ln -fs "${CWD}/customizations.bash" "${HOME}/.bash-it/custom/"
-  ln -fs "${CWD}/nuna.bash" "${HOME}/.bash-it/custom/"
-  ln -fs "${CWD}/starship.toml" "${HOME}/.config/"
+  ln -fs "${CWD}/.inputrc" "${HOME}/"
+  ln -fs "${CWD}/.tmux.conf" "${HOME}/"
+  ln -s "${CWD}/.vimrc" "${HOME}/"
 }
 
 linux_symlinks()
 {
   echo "[ Making Symlinks ]"
-  mkdir -p \
-    "${HOME}/.local/share/navi/cheats" \
-    "${HOME}/.bash-it/custom/" \
-    "${HOME}/.config"
-  
-  ln -fs "${CWD}/my.cheat" "${HOME}/.local/share/navi/cheats/"
-  ln -fs "${CWD}/customizations.bash" "${HOME}/.bash-it/custom/"
-  ln -fs "${CWD}/nuna.bash" "${HOME}/.bash-it/custom/"
-  ln -fs "${CWD}/starship.toml" "${HOME}/.config/"
+  ln -fs "${CWD}/.inputrc" "${HOME}/"
+  ln -fs "${CWD}/.tmux.conf" "${HOME}/"
+  ln -s "${CWD}/.vimrc" "${HOME}/"
 }
 
 configure_vim()
 {
   echo "[ Configuring Vim ]"
-  [[ -f "${HOME}/.vimrc" ]] && return
   mkdir -p "${HOME}/.vim/pack/default/start"
   git clone https://github.com/morhetz/gruvbox.git "${HOME}/.vim/pack/default/start/gruvbox"
   git clone https://github.com/sheerun/vim-polyglot "${HOME}/.vim/pack/default/start/vim-polyglot"
-  ln -s "${CWD}/.vimrc" "${HOME}/.vimrc"
-}
-
-install_bashit() 
-{
-  echo "[ Installing Bash-It ]"
-  # can't install bash-it without git
-  git --version || return 
-  read -e -s -p "Install Bash-it [y/N]? " -n 1 -r
-  if [[ "${REPLY}" =~ ^[Yy]$ ]]; then
-    if [[ -d "${HOME}/.bash-it" ]]; then
-      pushd "${HOME}/.bash-it"
-      git pull
-      popd
-    else
-      /usr/bin/git clone --depth=1 https://github.com/Bash-it/bash-it.git "${HOME}/.bash-it"
-      eval "${HOME}/.bash-it/install.sh" --silent
-    fi
-  fi
 }
 
 install_homebrew()
@@ -106,7 +74,6 @@ install_brew_apps()
     jq \
     mcfly \
     mtr \
-    navi \
     openssh \
     openssl \
     pipx \
@@ -116,18 +83,17 @@ install_brew_apps()
     python \
     ripgrep \
     ruby \
-    sd \
     shellcheck \
     starship \
     tfenv \
     thefuck \
+    tldr \
     tmux \
     tree \
     vim \
     wget \
     youtube-dl \
-    yq \
-    z
+    yq
   fi
 }
 
@@ -167,15 +133,8 @@ install_linux_apps()
     sudo dpkg -i /tmp/rg.deb
   }
 
-  which sd || {
-    version=$(get_latest_version https://github.com/chmln/sd)
-    sudo curl -sL "https://github.com/chmln/sd/releases/download/v${version}/sd-v${version}-x86_64-unknown-linux-musl" -o /usr/local/bin/sd
-    sudo chmod +x /usr/local/bin/sd
-  }
-  
-  which navi || {
-    curl -sL https://raw.githubusercontent.com/denisidoro/navi/master/scripts/install | sudo /bin/bash
-    navi repo add denisidoro/navi-tldr-pages
+  which starship || {
+    sh -c "$(curl -fsSL https://starship.rs/install.sh)"
   }
 }
 
@@ -185,10 +144,11 @@ case $(uname) in
     xcode-select --install
     install_homebrew
     install_brew_apps
-    install_bashit
     configure_vim
     macos_symlinks
-    sd 'bobby' 'powerline' ~/.bash_profile 2>/dev/null
+    echo "for f in ${CWD}/*.bash; do source \${f}; done" >> "${HOME}/.bash_profile"
+    echo "export STARSHIP_CONFIG=${CWD}/starship.toml" >> "${HOME}/.bash_profile"
+    echo "eval \"\$(starship init bash)\"" >> "${HOME}/.bash_profile"
     echo "REMEMBER: source ~/.bash_profile"
     ;;
   Linux)
@@ -202,11 +162,12 @@ case $(uname) in
       shellcheck \
       golang-go \
       tmux
-    install_bashit
     configure_vim
     linux_symlinks
     install_linux_apps
-    sd 'bobby' 'powerline' ~/.bashrc 2>/dev/null
+    echo "for f in ${CWD}/*.bash; do source \${f}; done" >> "${HOME}/.bashrc"
+    echo "export STARSHIP_CONFIG=${CWD}/starship.toml" >> "${HOME}/.bashrc"
+    echo "eval \"\$(starship init bash)\"" >> "${HOME}/.bashrc"
     echo "REMEMBER: source ~/.bashrc"
     ;;
   *)
