@@ -12,13 +12,12 @@ $git_branch\
 $git_commit\
 $git_state\
 $git_status\
-[\ue0b4](fg:#333333 bg:black)\
 $golang\
 $nodejs\
 $php\
 $python\
 $ruby\
-$aws\
+[\ue0b4](fg:#333333 bg:black)\
 $line_break\
 $jobs\
 $time\
@@ -69,21 +68,21 @@ format = "[ $all_status ](bg:#333333 $style)"
 [package]
 disabled = true
 
-[aws]
-disabled = true
-format = '[$symbol($profile )]($style)'
-
 [golang]
 symbol = " "
+format = "[ $symbol$version](bg:#333333 $style)"
 
 [nodejs]
 symbol = " "
+format = "[ $symbol$version](bg:#333333 $style)"
 
 [python]
 symbol = " "
+format = "[ $symbol$version](bg:#333333 $style)"
 
 [ruby]
 symbol = " "
+format = "[ $symbol$version](bg:#333333 $style)"
 
 [time]
 disabled = false
