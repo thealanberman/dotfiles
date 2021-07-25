@@ -48,6 +48,12 @@ export AWS_PAGER=""
 export UNAME=$(uname)
 
 #--------------------------------- #
+# spotify_dl credentials
+#--------------------------------- #
+export SPOTIPY_CLIENT_ID='bb7478506cff4052b7f9b4bec2669f93'
+export SPOTIPY_CLIENT_SECRET='1ca82f92eff145b996e80004463ff18b'
+
+#--------------------------------- #
 # ALIASES
 # --------------------------------- #
 alias l='ls -GhalF'
@@ -59,7 +65,7 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias df='df -H'
 alias ff='fd'
-alias yta="youtube-dl --ignore-errors --format m4a"
+alias yta="youtube-dl --ignore-errors --yes-playlist --format m4a"
 alias now="date +%Y%m%dT%H%M%S"
 alias reload="source ~/.bashrc" # overridden later if Darwin
 alias timestamp="now"
@@ -265,6 +271,14 @@ audio_trim() {
   ffmpeg -ss 0 -t "${2}" -i "${1}" -vn -c copy "${1%.*}_trimmed.${1##*.}"
 }
 
+audio_selection() {
+  [[ $2 ]] || {
+    echo "Usage: audio_selection <file> <HH:MM:SS> <HH:MM:SS>"
+    return 1
+  }
+  ffmpeg -i "${1}" -ss "${2}" -to "${3}" -c copy "${1%.*}_selection.${1##*.}"
+}
+
 audio_join() {
   [[ ${3} ]] || {
     echo "Usage: audio_join <file1> <file2> <output>"
@@ -303,4 +317,27 @@ splay() {
   sleep ${seconds}
   shift
   eval "${@}"
+}
+
+loop() {
+  while true; do
+    $1
+  done
+}
+
+a2v() {
+  [[ $1 ]] || { echo "USAGE: a2v <image file> <audio file>"; return 1; }
+  outfile=$(basename "${2}" | tr -d " ")
+  ffmpeg -r 1 -loop 1 \
+  -i "${1}" \
+  -i "${2}" \
+  -acodec copy -r 1 -shortest \
+  "${outfile%.*}.mp4"
+}
+
+vaxcheck() {
+  while true; do
+    http https://vax.sccgov.org/ --check-status -q && { say available; echo "$(timestamp) available"; } || { echo "$(timestamp) not yet"; }
+    sleep 60
+  done
 }

@@ -4,8 +4,8 @@ export NUNA_ROOT="${HOME}/code/analytics"
 export VAULT_ROOT="${HOME}/code/vault"
 export SSH_ENV="${HOME}/.ssh/environment"
 export ADMIN_USERNAME='alan-admin'
-export VAULT_ADDR="https://vault.int.nunahealth.com"
 export CDPATH=:..:~:${NUNA_ROOT}/configs/nunahealth/aws/cloudformation:${NUNA_ROOT}/configs/nunahealth:${HOME}/code:
+export NUNA_MFA_METHOD=token
 
 # Terraform shared cache
 # See: https://www.terraform.io/docs/configuration/providers.html#provider-plugin-cache
@@ -14,22 +14,69 @@ export TF_PLUGIN_CACHE_DIR="${HOME}/.terraform.d/plugin-cache"
 alias analytics="cd \${NUNA_ROOT}"
 alias deployments="cd \${NUNA_ROOT}/configs/nunahealth/aws/cloudformation/deployments"
 alias changepw="\${HOME}/code/changepw/changepw.py"
-alias bastion="\${HOME}/code/it-bastion-ssh-server/bastion.sh"
 alias mfa="vault-auth-aws-init"
 alias mfaidm="vault-auth-aws-init -a nuna-identity-management -r admin"
+alias ws="ssh -A alan.ws.int.nunahealth.com"
 alias cfrun="docker run cfrun"
 alias ecr-login="aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 254566265011.dkr.ecr.us-west-2.amazonaws.com"
+alias na="nuna_access"
+
+### VAULT THINGS
+export VAULT_ADDR=${VAULT_ADDR:-https://vault.int.nunahealth.com}
+alias vth="vault-token-helper"
+
+vault-login() {
+  vault login -method=ldap username="${1:-$USER}" passcode="$(read -rp 'Yubikey tap: ' && echo ${REPLY})"
+}
 
 daily() {
-    set -x
-    vpn \
-    && sleep 10 \
-    && mfa \
-    && sleep 10 \
-    && sandbox up \
-    && sleep 10 \
-    && sandbox ssh
-    set +x
+  nuna_access login
+  VAULT_ADDR=https://vault.int.nunahealth.com vault login -method=ldap username="${1:-$USER}" passcode="$(read -rp 'Yubikey tap: ' && echo ${REPLY})"
+  VAULT_ADDR=https://vault.staging.nuna.health vault login -method=ldap username="${1:-$USER}" passcode="$(read -rp 'Yubikey tap: ' && echo ${REPLY})"
+  VAULT_ADDR=https://vault.nuna.health vault login -method=ldap username="${1:-$USER}" passcode="$(read -rp 'Yubikey tap: ' && echo ${REPLY})"
+}
+
+ec2user() {
+  nuprod -e "${1}" -u ubuntu && nuprod -e "${1}" -u ec2-user
+  if [[ "${2}" ]] && [[ "${1}" == "testing" ]]; then
+    ssh -A -J ubuntu@bastion.staging.nuna.health "ec2-user@${2}"
+  elif [[ "${2}" ]] && [[ "${1}" == "stable" ]]; then
+    ssh -A -J ubuntu@bastion.nuna.health "ec2-user@${2}"
+  else
+    echo "USAGE: ec2user <enclave> <IP>"
+  fi
+}
+
+ubuntu() {
+  nuprod -e "${1}" -u ubuntu
+  if [[ "${2}" ]] && [[ "${1}" == "testing" ]]; then
+    ssh -A -J ubuntu@bastion.staging.nuna.health "ubuntu@${2}"
+  elif [[ "${2}" ]] && [[ "${1}" == "stable" ]]; then
+    ssh -A -J ubuntu@bastion.nuna.health "ubuntu@${2}"
+  else
+    echo "USAGE: ubuntu <enclave> <IP>"
+  fi
+}
+
+
+ptest() {
+  [[ -z "${1}" ]] && { echo "export AWS_PROFILE=lob-product-testing"; return; }
+  AWS_PROFILE=lob-product-testing "${@}"
+}
+
+pstable() {
+  [[ -z "${1}" ]] && { echo "export AWS_PROFILE=lob-product-stable"; return; }
+  AWS_PROFILE=lob-product-stable "${@}"
+}
+
+sstable() {
+  [[ -z "${1}" ]] && { echo "export AWS_PROFILE=lob-security-stable"; return; }
+  AWS_PROFILE=lob-security-stable "${@}"
+}
+
+stest() {
+  [[ -z "${1}" ]] && { echo "export AWS_PROFILE=lob-security-testing"; return; }
+  AWS_PROFILE=lob-security-testing "${@}"
 }
 
 nuna() {
@@ -73,21 +120,12 @@ sandbox() {
     esac
 }
 
-# shellcheck disable=SC2120
-ssh-yubi() {
-  ssh-add -e /usr/local/lib/opensc-pkcs11.so >/dev/null 2>&1
-  ssh-add -s /usr/local/lib/opensc-pkcs11.so
-}
-
-ssh-yubikey-pub() {
-  ssh-keygen -D /usr/local/lib/opensc-pkcs11.so -e
-}
-
 instance() {
   instancehelp() {
     printf "USAGE:\n\t"
     printf "instance search <name or partial name>\n\t"
     printf "instance ami <name or partial name>\n\t"
+    printf "instance delete <ids>\n\t"
     printf "instance ssh <name or private IP>\n\t"
     printf "instance ssh <service> <tier>\n"
   }
@@ -108,6 +146,9 @@ instance() {
       aws ec2 describe-instances --instance-ids "${instance_id}" \
         --query "Reservations[0].Instances[0].ImageId" \
         --output text
+      ;;
+    delete)
+      awless delete instance ids="${2}"
       ;;
     *)
       instancehelp
@@ -149,10 +190,6 @@ stack() {
   esac
 }
 
-newscript() {
-  cp "${HOME}/main.sh" "${1:-main.sh}" && echo "${1:-main.sh} created."
-}
-
 initlog() {
   if [[ -z "${1}" ]]; then
     printf "ABOUT\n"
@@ -172,24 +209,9 @@ initlog() {
   fi
 }
 
-# Called as `prompw prod` this fetches the prod password from vault and puts it in your Mac's clipboard
-prompw () {
-  aws sts get-caller-identity > /dev/null 2>&1 || { echo "ERROR: 'vault-auth-aws.sh' first!"; return 1; }
-  [[ "${1}" == "dev" || "${1}" == "prod" ]] || { echo "ERROR: must specify 'dev' or 'prod'"; return 1; }
-  vault read -field=value "nuna/${1}/prometheus/http/password" | pbcopy && echo "clipboarded"
-}
-
 rds () {
   local role="${1}"
   local tier="${2}"
   [[ -z ${role} || -z ${tier} ]] && { echo "USAGE: rds <service> <tier>"; return 1; }
   dig "rds-${role}-${tier}.int.nunahealth.com" CNAME +short @10.8.0.2 | sed 's,\..*,,'
-}
-
-vstaging() {
-  local pass=$(lpass show --password vault.staging.nuna.health)
-  export VAULT_ADDR="https://vault.staging.nuna.health"
-  vault login -method=userpass username="${USER}"
-  sleep 1
-  yes "${pass}"
 }
