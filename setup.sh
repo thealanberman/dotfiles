@@ -25,12 +25,14 @@ macos_symlinks()
 {
   echo "[ Making Symlinks ]"
   mkdir -p \
-    "${HOME}/Library/Application Support/navi/cheats"
-    "${HOME}/.bash-it/custom/"
+    "${HOME}/Library/Application Support/navi/cheats" \
+    "${HOME}/.bash-it/custom" \
+    "${HOME}/.config"
 
   ln -fs "${CWD}/my.cheat" "${HOME}/Library/Application Support/navi/cheats/"
   ln -fs "${CWD}/customizations.bash" "${HOME}/.bash-it/custom/"
   ln -fs "${CWD}/nuna.bash" "${HOME}/.bash-it/custom/"
+  ln -fs "${CWD}/starship.toml" "${HOME}/.config/"
 }
 
 linux_symlinks()
@@ -38,11 +40,13 @@ linux_symlinks()
   echo "[ Making Symlinks ]"
   mkdir -p \
     "${HOME}/.local/share/navi/cheats" \
-    "${HOME}/.bash-it/custom/"
+    "${HOME}/.bash-it/custom/" \
+    "${HOME}/.config"
   
   ln -fs "${CWD}/my.cheat" "${HOME}/.local/share/navi/cheats/"
   ln -fs "${CWD}/customizations.bash" "${HOME}/.bash-it/custom/"
   ln -fs "${CWD}/nuna.bash" "${HOME}/.bash-it/custom/"
+  ln -fs "${CWD}/starship.toml" "${HOME}/.config/"
 }
 
 configure_vim()
@@ -100,6 +104,7 @@ install_brew_apps()
     highlight \
     lazydocker \
     jq \
+    mcfly \
     mtr \
     navi \
     openssh \
