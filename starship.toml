@@ -1,0 +1,90 @@
+# guide to powerline symbols https://awesomeopensource.com/project/ryanoasis/powerline-extra-symbols
+# guide to style strings https://starship.rs/advanced-config/#style-strings
+
+format = """
+$username\
+[\ue0b0](bg:#333333 fg:#222222)\
+$hostname\
+[\ue0b0](bg:#444444 fg:#333333)\
+$directory\
+[\ue0b0](bg:#333333 fg:#444444)\
+$git_branch\
+$git_commit\
+$git_state\
+$git_status\
+[\ue0b4](fg:#333333 bg:black)\
+$golang\
+$nodejs\
+$php\
+$python\
+$ruby\
+$aws\
+$line_break\
+$jobs\
+$time\
+$status\
+$character"""
+
+add_newline = false
+command_timeout = 1500
+
+[character]
+error_symbol = "[ ✖](bold red) ❯"
+
+[cmd_duration]
+disabled = false
+
+[username]
+format = "[ $user ](bg:#222222)"
+disabled = false
+show_always = true
+
+[hostname]
+format = "[ $hostname ](bg:#333333)"
+ssh_only = false
+trim_at = ""
+disabled = false
+
+[directory]
+format = "[ $path ](bg:#444444)[$read_only](bg:#444444 $read_only_style)"
+truncation_length = 3
+truncate_to_repo = true
+# prefix = "in "
+# style = "bold cyan"
+disabled = false
+
+[git_branch]
+format = "[ $symbol$branch](bg:#333333 $style)"
+symbol = " "
+
+[git_commit]
+format = "[\\($hash\\)](bg:#333333 $style) [\\($tag\\)](bg:#333333 $style)"
+
+[git_state]
+format = '\([$state( $progress_current/$progress_total)](bg:#333333 $style)\)'
+
+[git_status]
+format = "[ $all_status ](bg:#333333 $style)"
+
+[package]
+disabled = true
+
+[aws]
+disabled = true
+format = '[$symbol($profile )]($style)'
+
+[golang]
+symbol = " "
+
+[nodejs]
+symbol = " "
+
+[python]
+symbol = " "
+
+[ruby]
+symbol = " "
+
+[time]
+disabled = false
+format = "[$time]($style)"

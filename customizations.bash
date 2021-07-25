@@ -19,6 +19,13 @@ if [[ $(command -v cargo) ]]; then
   export PATH="${HOME}/.cargo/bin:${PATH}"
 fi
 
+if [[ $(command -v mcfly) ]]; then
+  eval "$(mcfly init bash)"
+fi
+
+# Enable Marker -- https://github.com/pindexis/marker
+[[ -s "$HOME/.local/share/marker/marker.sh" ]] && source "$HOME/.local/share/marker/marker.sh"
+
 # --------------------------------- #
 # https://github.com/Bash-it/bash-it/tree/master/themes/powerline-multiline
 # --------------------------------- #
@@ -29,6 +36,7 @@ export POWERLINE_RIGHT_PROMPT="clock user_info"
 # EDITOR
 # --------------------------------- #
 export EDITOR="vim"
+which -s code && export EDITOR="code"
 
 # --------------------------------- #
 # AWS PAGER
@@ -48,11 +56,13 @@ alias ll='l'
 alias sshconfig="${EDITOR} ${HOME}/.ssh/config"
 alias dev="cd ${HOME}/code"
 alias cd..='cd ..'
+alias ..='cd ..'
+alias ...='cd ../..'
 alias df='df -H'
 alias ff='fd'
 alias yta="youtube-dl --ignore-errors --format m4a"
 alias now="date +%Y%m%dT%H%M%S"
-alias reload="source ~/.bashrc"
+alias reload="source ~/.bashrc" # overridden later if Darwin
 alias timestamp="now"
 alias today="date +%Y%m%d"
 alias ports="lsof -i -U -n -P | grep LISTEN"
@@ -64,6 +74,9 @@ alias dcompose="docker-compose"
 alias ccat="highlight $1 --out-format xterm256 --line-numbers --quiet --force --style solarized-light"
 alias zshell="PS1='[%n] %~%% ' zsh"
 alias tips="tldr"
+alias gs='git status'
+alias gc='git commit'
+alias gb='git branch'
 
 # initialize z shortcut, if installed
 [[ -f /usr/local/etc/profile.d/z.sh ]] && source /usr/local/etc/profile.d/z.sh
@@ -112,7 +125,7 @@ aliases() {
 }
 
 s3cat() {
-  [[ -n "${1}" ]] || {
+  [[ ${1} ]] || {
     echo "Usage: s3cat <full S3 URL>"
     return 1
   }
@@ -162,16 +175,6 @@ lowercase() {
 
 uppercase() {
   tr '[:lower:]' '[:upper:]' <<<"${1}"
-}
-
-# same as dd but with progress meter!
-ddprogress() {
-  [[ "$(command -v pv)" ]] || {
-    echo "brew install pv first"
-    return
-  }
-  [[ -e "${2}" ]] || echo "Usage: ddprogress [SOURCE] [DESTINATION]"
-  sudo pv -tpreb "${1}" | sudo dd bs=1m of="${2}"
 }
 
 # incognito mode for shell
@@ -225,11 +228,15 @@ pinger() {
 }
 
 kh() {
-  sed -i.bak -e ${1}d "${HOME}/.ssh/known_hosts"
+  [[ ${1} ]] || { 
+    echo "USAGE: kh <host to remove from known_hosts>"
+    return 1
+  }
+  ssh-keygen -R "${1}"
 }
 
 retry() {
-  [[ -z "${1}" ]] && {
+  [[ ${1} ]] || {
     echo "USAGE: retry <number of tries> <command>"
     return 1
   }
