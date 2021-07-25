@@ -118,6 +118,7 @@ install_brew_apps()
     ruby \
     sd \
     shellcheck \
+    starship \
     tfenv \
     thefuck \
     tmux \
