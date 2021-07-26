@@ -14,8 +14,6 @@ export TF_PLUGIN_CACHE_DIR="${HOME}/.terraform.d/plugin-cache"
 alias analytics="cd \${NUNA_ROOT}"
 alias deployments="cd \${NUNA_ROOT}/configs/nunahealth/aws/cloudformation/deployments"
 alias changepw="\${HOME}/code/changepw/changepw.py"
-alias mfa="vault-auth-aws-init"
-alias mfaidm="vault-auth-aws-init -a nuna-identity-management -r admin"
 alias ws="ssh -A alan.ws.int.nunahealth.com"
 alias cfrun="docker run cfrun"
 alias ecr-login="aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 254566265011.dkr.ecr.us-west-2.amazonaws.com"
@@ -31,6 +29,7 @@ vault-login() {
 
 daily() {
   nuna_access login
+  prompty "login to all 3 vaults?" || return
   VAULT_ADDR=https://vault.int.nunahealth.com vault login -method=ldap username="${1:-$USER}" passcode="$(read -rp 'Yubikey tap: ' && echo ${REPLY})"
   VAULT_ADDR=https://vault.staging.nuna.health vault login -method=ldap username="${1:-$USER}" passcode="$(read -rp 'Yubikey tap: ' && echo ${REPLY})"
   VAULT_ADDR=https://vault.nuna.health vault login -method=ldap username="${1:-$USER}" passcode="$(read -rp 'Yubikey tap: ' && echo ${REPLY})"
@@ -58,6 +57,10 @@ ubuntu() {
   fi
 }
 
+idm () {
+  [[ -z "${1}" ]] && { echo "export AWS_PROFILE=nuna-identity-management-admin"; return; }
+  AWS_PROFILE=nuna-identity-management-admin "${@}"
+}
 
 ptest() {
   [[ -z "${1}" ]] && { echo "export AWS_PROFILE=lob-product-testing"; return; }

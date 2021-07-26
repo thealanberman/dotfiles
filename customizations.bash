@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 if [[ -d "${HOME}/.pyenv" ]]; then
-  export PYENV_ROOT="${HOME}/.pyenv"
+  export PYENV_ROOT="$HOME/.pyenv"
   export PATH="$PYENV_ROOT/bin:$PATH"
-  eval "$(pyenv init -)"
+  eval "$(pyenv init --path)"
 fi
 
 if [[ ! "${GOPATH}" ]]; then
@@ -69,15 +69,11 @@ alias t="tmux attach || tmux new"
 alias tf="terraform"
 alias box="draw"
 alias dcompose="docker-compose"
-alias ccat="highlight $1 --out-format xterm256 --line-numbers --quiet --force --style solarized-light"
 alias zshell="PS1='[%n] %~%% ' zsh"
 alias tips="tldr"
 alias gs='git status'
 alias gc='git commit'
 alias gb='git branch'
-
-# initialize z shortcut, if installed
-[[ -f /usr/local/etc/profile.d/z.sh ]] && source /usr/local/etc/profile.d/z.sh
 
 # --------------------------------- #
 # DARWIN ALIASES
@@ -128,6 +124,16 @@ s3cat() {
     return 1
   }
   aws s3 cp "${1}" - | cat
+}
+
+prompty() {
+  while true; do
+    read -p "${1} [y/N] " -n 1 -r
+    echo # (optional) move to a new line
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+      return 1 # handle exits from shell or function but don't exit interactive shell
+    fi
+  done
 }
 
 dmg() {
@@ -216,17 +222,8 @@ yaml2json() {
   echo "Created ${1}.json"
 }
 
-pinger() {
-  ping_cancelled=false                                # Keep track of whether the loop was cancelled, or succeeded
-  until ping -c1 "${1}" >/dev/null 2>&1; do :; done & # The "&" backgrounds it
-  trap "kill $!; ping_cancelled=true" SIGINT
-  wait $!       # Wait for the loop to exit, one way or another
-  trap - SIGINT # Remove the trap, now we're done with it
-  echo "Done pinging, cancelled=${ping_cancelled}"
-}
-
 kh() {
-  [[ ${1} ]] || { 
+  [[ ${1} ]] || {
     echo "USAGE: kh <host to remove from known_hosts>"
     return 1
   }
@@ -264,6 +261,7 @@ audio_trim() {
   ffmpeg -ss 0 -t "${2}" -i "${1}" -vn -c copy "${1%.*}_trimmed.${1##*.}"
 }
 
+alias audio_substr="audio_selection"
 audio_selection() {
   [[ $2 ]] || {
     echo "Usage: audio_selection <file> <HH:MM:SS> <HH:MM:SS>"
@@ -286,6 +284,7 @@ audio_join() {
 
 hashafter() {
   { [[ $1 ]] && [[ $2 ]]; } || {
+    echo "Check SHA sum of all files after line N."
     echo "Usage: hashafter <filename> <line number>"
     return 1
   }
@@ -298,7 +297,7 @@ ramdisk() {
     return 1
   }
   ramdisk_size=$((${1} * 2048))
-  diskutil erasevolume HFS+ 'RAMDisk' $(hdiutil attach -nobrowse -nomount ram://${ramdisk_size})
+  diskutil erasevolume HFS+ 'RAMDisk' "$(hdiutil attach -nobrowse -nomount ram://${ramdisk_size})"
 }
 
 splay() {
@@ -319,18 +318,15 @@ loop() {
 }
 
 a2v() {
-  [[ $1 ]] || { echo "USAGE: a2v <image file> <audio file>"; return 1; }
+  [[ $1 ]] || { 
+    echo "Audio 2 Video"
+    echo "USAGE: a2v <image file> <audio file>"
+    return 1
+    }
   outfile=$(basename "${2}" | tr -d " ")
   ffmpeg -r 1 -loop 1 \
   -i "${1}" \
   -i "${2}" \
   -acodec copy -r 1 -shortest \
   "${outfile%.*}.mp4"
-}
-
-vaxcheck() {
-  while true; do
-    http https://vax.sccgov.org/ --check-status -q && { say available; echo "$(timestamp) available"; } || { echo "$(timestamp) not yet"; }
-    sleep 60
-  done
 }
