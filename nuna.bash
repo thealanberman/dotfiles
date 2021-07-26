@@ -80,7 +80,7 @@ stest() {
 }
 
 nuna() {
-  which -s code || "${EDITOR}" "${DOTFILES}/nuna.bash" && code "${DOTFILES}/nuna.bash"
+  which code || "${EDITOR}" "${DOTFILES}/nuna.bash" && code "${DOTFILES}/nuna.bash"
 }
 
 sandbox() {

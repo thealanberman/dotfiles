@@ -35,7 +35,6 @@ export DOTFILES="${HOME}/code/dotfiles"
 # EDITOR
 # --------------------------------- #
 export EDITOR="vim"
-which -s code && export EDITOR="code"
 
 # --------------------------------- #
 # AWS PAGER
@@ -46,12 +45,6 @@ export AWS_PAGER=""
 # UNAME (a.k.a OS type)
 # --------------------------------- #
 export UNAME=$(uname)
-
-#--------------------------------- #
-# spotify_dl credentials
-#--------------------------------- #
-export SPOTIPY_CLIENT_ID='bb7478506cff4052b7f9b4bec2669f93'
-export SPOTIPY_CLIENT_SECRET='1ca82f92eff145b996e80004463ff18b'
 
 #--------------------------------- #
 # ALIASES
@@ -126,7 +119,7 @@ export LESS=" -R"
 # FUNCTIONS
 # --------------------------------- #
 aliases() {
-  which -s code || "${EDITOR}" "${DOTFILES}/customizations.bash" && code "${DOTFILES}/customizations.bash"
+  which code || "${EDITOR}" "${DOTFILES}/customizations.bash" && code "${DOTFILES}/customizations.bash"
 }
 
 s3cat() {
