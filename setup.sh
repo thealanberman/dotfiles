@@ -80,7 +80,6 @@ install_brew_apps()
     shellcheck \
     starship \
     tfenv \
-    thefuck \
     tldr \
     tmux \
     tree \
@@ -140,6 +139,7 @@ case $(uname) in
     install_brew_apps
     configure_vim
     make_symlinks
+    echo "export BASH_SILENCE_DEPRECATION_WARNING=1" >> "${HOME}/.bash_profile"
     echo "for f in ${CWD}/*.bash; do source \${f}; done" >> "${HOME}/.bash_profile"
     echo "export STARSHIP_CONFIG=${CWD}/starship.toml" >> "${HOME}/.bash_profile"
     echo "eval \"\$(starship init bash)\"" >> "${HOME}/.bash_profile"
