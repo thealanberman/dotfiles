@@ -21,17 +21,11 @@ append_inputrc()
   fi
 }
 
-macos_symlinks()
+make_symlinks()
 {
   echo "[ Making Symlinks ]"
-  ln -fs "${CWD}/.inputrc" "${HOME}/"
-  ln -fs "${CWD}/.tmux.conf" "${HOME}/"
-  ln -s "${CWD}/.vimrc" "${HOME}/"
-}
-
-linux_symlinks()
-{
-  echo "[ Making Symlinks ]"
+  mkdir -p "${HOME}/.ssh"
+  ln -fs "${CWD}/ssh_config" "${HOME}/.ssh/config"
   ln -fs "${CWD}/.inputrc" "${HOME}/"
   ln -fs "${CWD}/.tmux.conf" "${HOME}/"
   ln -s "${CWD}/.vimrc" "${HOME}/"
@@ -145,7 +139,7 @@ case $(uname) in
     install_homebrew
     install_brew_apps
     configure_vim
-    macos_symlinks
+    make_symlinks
     echo "for f in ${CWD}/*.bash; do source \${f}; done" >> "${HOME}/.bash_profile"
     echo "export STARSHIP_CONFIG=${CWD}/starship.toml" >> "${HOME}/.bash_profile"
     echo "eval \"\$(starship init bash)\"" >> "${HOME}/.bash_profile"
@@ -163,7 +157,7 @@ case $(uname) in
       golang-go \
       tmux
     configure_vim
-    linux_symlinks
+    make_symlinks
     install_linux_apps
     echo "for f in ${CWD}/*.bash; do source \${f}; done" >> "${HOME}/.bashrc"
     echo "export STARSHIP_CONFIG=${CWD}/starship.toml" >> "${HOME}/.bashrc"
