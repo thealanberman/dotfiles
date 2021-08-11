@@ -130,7 +130,8 @@ instance() {
     printf "instance ami <name or partial name>\n\t"
     printf "instance delete <ids>\n\t"
     printf "instance ssh <name or private IP>\n\t"
-    printf "instance ssh <service> <tier>\n"
+    printf "instance ssh <service> <tier>\n\t"
+    printf "instance packers (list+prompt to terminate all packer instances)\n"
   }
   case "${1}" in
     search)
@@ -152,6 +153,13 @@ instance() {
       ;;
     delete)
       awless delete instance ids="${2}"
+      ;;
+    packers)
+      awless list instances --filter name=packer,state=running
+      prompty "Terminate all running Packer instances?" || return
+      for i in $(awless list instances --filter name=packer,state=running --columns id,name,state --format json | jq -r .[].ID); do 
+        awless delete instance -f --no-sync id="${i}"
+      done
       ;;
     *)
       instancehelp
