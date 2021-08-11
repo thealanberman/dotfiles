@@ -25,10 +25,13 @@ make_symlinks()
 {
   echo "[ Making Symlinks ]"
   mkdir -p "${HOME}/.ssh"
+  mkdir -p "${HOME}/.aws"
   ln -fs "${CWD}/ssh_config" "${HOME}/.ssh/config"
   ln -fs "${CWD}/.inputrc" "${HOME}/"
   ln -fs "${CWD}/.tmux.conf" "${HOME}/"
   ln -s "${CWD}/.vimrc" "${HOME}/"
+  ln -s "${CWD}/prompty" "/usr/local/bin/"
+  ln -s "${CWD}/nuna_aws_config" "${HOME}/.aws/config"
 }
 
 configure_vim()

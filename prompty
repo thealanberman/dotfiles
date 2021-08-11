@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+read -p "${1} [y/N] " -n 1 -r
+echo
+[[ $REPLY =~ ^[Yy]$ ]] || exit 1

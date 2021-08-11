@@ -126,16 +126,6 @@ s3cat() {
   aws s3 cp "${1}" - | cat
 }
 
-prompty() {
-  while true; do
-    read -p "${1} [y/N] " -n 1 -r
-    echo # (optional) move to a new line
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-      return 1 # handle exits from shell or function but don't exit interactive shell
-    fi
-  done
-}
-
 dmg() {
   if [[ -d ${1} ]] && [[ -d ${2} ]]; then
     VOL="$(basename "${1}")"
@@ -313,7 +303,7 @@ splay() {
 
 loop() {
   while true; do
-    $1
+    $@
   done
 }
 
