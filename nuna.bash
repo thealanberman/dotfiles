@@ -33,6 +33,7 @@ daily() {
   VAULT_ADDR=https://vault.int.nunahealth.com vault login -method=ldap username="${1:-$USER}" passcode="$(read -rp 'Yubikey tap: ' && echo ${REPLY})"
   VAULT_ADDR=https://vault.staging.nuna.health vault login -method=ldap username="${1:-$USER}" passcode="$(read -rp 'Yubikey tap: ' && echo ${REPLY})"
   VAULT_ADDR=https://vault.nuna.health vault login -method=ldap username="${1:-$USER}" passcode="$(read -rp 'Yubikey tap: ' && echo ${REPLY})"
+  VAULT_ADDR=https://vault.testing.nuna.cloud vault login -method=ldap -path=ldap/ad username="${1:-$USER}" passcode="$(read -rp 'Yubikey tap: ' && echo ${REPLY})"
 }
 
 ec2user() {
@@ -155,7 +156,7 @@ instance() {
       awless delete instance ids="${2}"
       ;;
     packers)
-      awless list instances --filter name=packer,state=running
+      awless list instances --filter name=packer,state=running || return
       prompty "Terminate all running Packer instances?" || return
       for i in $(awless list instances --filter name=packer,state=running --columns id,name,state --format json | jq -r .[].ID); do 
         awless delete instance -f --no-sync id="${i}"
