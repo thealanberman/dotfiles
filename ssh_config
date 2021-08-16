@@ -43,3 +43,6 @@ Host github-skull
   User git
   PubKeyAuthentication yes
   IdentityFile ~/.ssh/github_skull_rsa
+
+Host alan.ws.int.nunahealth.com
+  HostName alan.ws.int.nunahealth.com
