@@ -26,6 +26,9 @@ fi
 # Enable Marker -- https://github.com/pindexis/marker
 [[ -s "$HOME/.local/share/marker/marker.sh" ]] && source "$HOME/.local/share/marker/marker.sh"
 
+# Enable asdf -- https://github.com/asdf-vm/asdf
+[[ -f /usr/local/opt/asdf/libexec/asdf.sh ]] && source /usr/local/opt/asdf/libexec/asdf.sh
+
 # --------------------------------- #
 # DOTFILES
 # --------------------------------- #
