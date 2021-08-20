@@ -1,11 +1,5 @@
 #!/usr/bin/env bash
 
-if [[ -d "${HOME}/.pyenv" ]]; then
-  export PYENV_ROOT="$HOME/.pyenv"
-  export PATH="$PYENV_ROOT/bin:$PATH"
-  eval "$(pyenv init --path)"
-fi
-
 if [[ ! "${GOPATH}" ]]; then
   if [[ -d "${HOME}/code/go" ]]; then
     export GOPATH="${HOME}/code/go"
@@ -22,9 +16,6 @@ fi
 if [[ $(command -v mcfly) ]]; then
   eval "$(mcfly init bash)"
 fi
-
-# Enable Marker -- https://github.com/pindexis/marker
-[[ -s "$HOME/.local/share/marker/marker.sh" ]] && source "$HOME/.local/share/marker/marker.sh"
 
 # Enable asdf -- https://github.com/asdf-vm/asdf
 [[ -f /usr/local/opt/asdf/libexec/asdf.sh ]] && source /usr/local/opt/asdf/libexec/asdf.sh
