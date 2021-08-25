@@ -13,11 +13,11 @@ export TF_PLUGIN_CACHE_DIR="${HOME}/.terraform.d/plugin-cache"
 
 alias analytics="cd \${NUNA_ROOT}"
 alias deployments="cd \${NUNA_ROOT}/configs/nunahealth/aws/cloudformation/deployments"
-alias changepw="\${HOME}/code/changepw/changepw.py"
 alias ws="ssh -A alan.ws.int.nunahealth.com"
 alias cfrun="docker run cfrun"
 alias ecr-login="aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 254566265011.dkr.ecr.us-west-2.amazonaws.com"
 alias na="nuna_access"
+alias ap="awsprofiles"
 
 ### VAULT THINGS
 export VAULT_ADDR=${VAULT_ADDR:-https://vault.int.nunahealth.com}
@@ -58,29 +58,13 @@ ubuntu() {
   fi
 }
 
+awsprofiles () {
+  rg "\[profile" ${HOME}/.aws/config | cut -d' ' -f2 | sed 's/.$//'
+}
+
 idm () {
   [[ -z "${1}" ]] && { echo "export AWS_PROFILE=nuna-identity-management-admin"; return; }
   AWS_PROFILE=nuna-identity-management-admin "${@}"
-}
-
-ptest() {
-  [[ -z "${1}" ]] && { echo "export AWS_PROFILE=lob-product-testing"; return; }
-  AWS_PROFILE=lob-product-testing "${@}"
-}
-
-pstable() {
-  [[ -z "${1}" ]] && { echo "export AWS_PROFILE=lob-product-stable"; return; }
-  AWS_PROFILE=lob-product-stable "${@}"
-}
-
-sstable() {
-  [[ -z "${1}" ]] && { echo "export AWS_PROFILE=lob-security-stable"; return; }
-  AWS_PROFILE=lob-security-stable "${@}"
-}
-
-stest() {
-  [[ -z "${1}" ]] && { echo "export AWS_PROFILE=lob-security-testing"; return; }
-  AWS_PROFILE=lob-security-testing "${@}"
 }
 
 nuna() {

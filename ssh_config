@@ -10,6 +10,11 @@ Host github.com
   AddKeysToAgent yes
   IdentityFile ~/.ssh/github_rsa
 
+Host gitlab gitlab.nuna.cloud gitlab.int.nunahealth.com
+  User git
+  HostName gitlab.nuna.cloud
+  PKCS11Provider /usr/local/lib/opensc-pkcs11.so
+
 Host *.int.nunahealth.com *.nuna.cloud *.nuna.health
   ForwardAgent yes
   PubKeyAuthentication yes

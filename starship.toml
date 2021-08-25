@@ -17,7 +17,7 @@ $nodejs\
 $php\
 $python\
 $ruby\
-$custom\
+${custom.vault}\
 [\ue0b0](bg:black fg:#333333)\
 $line_break\
 $jobs\
@@ -92,5 +92,5 @@ format = "[$time]($style)"
 [custom.vault]
 command = "echo $VAULT_ADDR | cut -d. -f2-4"  # shows output of command
 symbol = ""
-when = """ test $VAULT_ADDR """
-format = "[$symbol$output](bg:#333333 $style)"
+when = """ [[ $VAULT_ADDR =~ vault ]] """
+format = "[$symbol$output](bg:#333333 fg:#444444)"
