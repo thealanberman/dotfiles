@@ -259,11 +259,7 @@ audio_join() {
     echo "Usage: audio_join <file1> <file2> <output>"
     return 1
   }
-  local pwd=$(pwd)
-  echo "file \"${pwd}/${1}\"" >/tmp/list.txt
-  echo "file \"${pwd}/${2}\"" >>/tmp/list.txt
-  ffmpeg -f concat -safe 0 -i /tmp/list.txt -c copy "${pwd}/${3}"
-  rm /tmp/list.txt
+  ffmpeg -i "concat:${1}|${2}" -c copy "${3}"
 }
 
 hashafter() {
