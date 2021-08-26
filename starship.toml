@@ -3,11 +3,8 @@
 
 format = """
 $username\
-[\ue0b0](bg:#333333 fg:#222222)\
 $hostname\
-[\ue0b0](bg:#444444 fg:#333333)\
 $directory\
-[\ue0b0](bg:#333333 fg:#444444)\
 $git_branch\
 $git_commit\
 $git_state\
@@ -17,9 +14,9 @@ $nodejs\
 $php\
 $python\
 $ruby\
-${custom.vault}\
-[\ue0b0](bg:black fg:#333333)\
 $line_break\
+${custom.vault_token}\
+${custom.vault}\
 ${custom.awsprofile}\
 ${custom.tfbackend}\
 $line_break\
@@ -28,6 +25,34 @@ $time\
 $status\
 $character
 """
+
+# format = """
+# $username\
+# [\ue0b0](bg:#333333 fg:#222222)\
+# $hostname\
+# [\ue0b0](bg:#444444 fg:#333333)\
+# $directory\
+# [\ue0b0](bg:#333333 fg:#444444)\
+# $git_branch\
+# $git_commit\
+# $git_state\
+# $git_status\
+# $golang\
+# $nodejs\
+# $php\
+# $python\
+# $ruby\
+# ${custom.vault}\
+# [\ue0b0](bg:black fg:#333333)\
+# $line_break\
+# ${custom.awsprofile}\
+# ${custom.tfbackend}\
+# $line_break\
+# $jobs\
+# $time\
+# $status\
+# $character
+# """
 
 add_newline = false
 command_timeout = 1500
@@ -58,55 +83,60 @@ truncate_to_repo = true
 disabled = false
 
 [git_branch]
-format = "[ $symbol$branch](bg:#333333 $style)"
+format = "[ $symbol$branch ](bg:#333333 $style)"
 symbol = " "
 
 [git_commit]
 format = "[\\($hash\\)](bg:#333333 $style) [\\($tag\\)](bg:#333333 $style)"
 
 [git_state]
-format = '\([$state( $progress_current/$progress_total)](bg:#333333 $style)\)'
+format = '\([$state( $progress_current/$progress_total)]()\)'
 
 [git_status]
-format = "[ $all_status ](bg:#333333 $style)"
+format = '[ $all_status ]($style)'
 
 [package]
 disabled = true
 
 [golang]
 symbol = " "
-format = "[ $symbol$version](bg:#333333 $style)"
+format = '\[[$symbol$version]($style)\]'
 
 [nodejs]
 symbol = " "
-format = "[ $symbol$version](bg:#333333 $style)"
+format = '\[[$symbol$version]($style)\]'
 
 [python]
 symbol = " "
-format = "[ $symbol$version](bg:#333333 $style)"
+format = '\[[$symbol$version]($style)\]'
 
 [ruby]
 symbol = " "
-format = "[ $symbol$version](bg:#333333 $style)"
+format = '\[[$symbol$version]($style)\]'
 
 [time]
 disabled = false
-format = "[$time]($style)"
+format = '[$time]($style)'
 
 [custom.vault]
-command = "echo $VAULT_ADDR | cut -d. -f2-4"  # shows output of command
-symbol = " "
-when = """ [[ $VAULT_ADDR =~ vault ]] """
-format = "[$symbol$output](bg:#333333 fg:#555555)"
+command = "echo $VAULT_ADDR | cut -d/ -f3"  # shows output of command
+symbol = " "
+when = "[[ $VAULT_ADDR =~ vault ]]"
+format = '\[[$symbol$output]()\]'
 
 [custom.awsprofile]
 command = "echo $AWS_PROFILE"
-symbol = " "
+symbol = " "
 when = "[[ -n $AWS_PROFILE ]]"
-format = "[$symbol$output](bg:#333333 fg:#00FF00)[\ue0b0](bg:#222222 fg:#333333)"
+format = '\[[$symbol$output]()\]'
 
 [custom.tfbackend]
 command = "jq -r .backend.config.key .terraform/terraform.tfstate"
-symbol = "行"
+symbol = " "
 when = "[[ -f .terraform/terraform.tfstate ]]"
-format = "[$symbol$output](bg:#222222 fg:#009900)[\ue0b0](fg:#222222)"
+format = '\[[$symbol$output]()\]'
+
+[custom.vault_token]
+command = "echo Ⓣ"
+when = "[[ -n $VAULT_TOKEN ]]"
+format = '[$symbol$output ]()'
