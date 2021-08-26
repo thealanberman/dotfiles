@@ -22,102 +22,102 @@ source_profile    = nunahealth
 role_session_name = alan
 region            = us-west-2
 
+[profile nuroot]
+# NOTE: I noticed NuRoot does not set an alias like nunahealth does (see the AWS SSO login page)
+aws_account_id = 102297706502
+target_region  = us-west-2
+
+[profile nucorp-parent]
+role_arn       = arn:aws:iam::310713536091:role/default-tf-assume-role
+source_profile = nuroot
+
+[profile nucorp-public-testing]
+role_arn       = arn:aws:iam::577396812066:role/default-tf-assume-role
+source_profile = nuroot
+
+[profile nucorp-security-testing]
+role_arn       = arn:aws:iam::560720567009:role/default-tf-assume-role
+source_profile = nuroot
+
+[profile nucorp-infra-experimental]
+role_arn       = arn:aws:iam::146967607003:role/default-tf-assume-role
+source_profile = nuroot
+
+[profile nucorp-infra-testing]
+role_arn       = arn:aws:iam::434281208410:role/default-tf-assume-role
+source_profile = nuroot
+
+[profile nucorp-security-experimental]
+role_arn       = arn:aws:iam::572150182598:role/default-tf-assume-role
+source_profile = nuroot
+
+[profile nucorp-public-stable]
+role_arn       = arn:aws:iam::559785372265:role/default-tf-assume-role
+source_profile = nuroot
+
+[profile nucorp-infra-stable]
+role_arn       = arn:aws:iam::388280479850:role/default-tf-assume-role
+source_profile = nuroot
+
+[profile nucorp-security-stable]
+role_arn       = arn:aws:iam::266110564225:role/default-tf-assume-role
+source_profile = nuroot
+
+[profile nucorp-public-experimental]
+role_arn       = arn:aws:iam::274159521565:role/default-tf-assume-role
+source_profile = nuroot
+
 [profile corp-public-stable]
 role_arn          = arn:aws:iam::745352344677:role/default-tf-assume-role
-source_profile    = nunahealth-admin
+source_profile    = nunahealth
 role_session_name = alan
 region            = us-west-2
 
 [profile corp-security-stable]
 role_arn          = arn:aws:iam::942364001311:role/default-tf-assume-role
-source_profile    = nunahealth-admin
+source_profile    = nunahealth
 role_session_name = alan
 region            = us-west-2
 
 [profile corp-infra-stable]
 role_arn          = arn:aws:iam::279140368836:role/default-tf-assume-role
-source_profile    = nunahealth-admin
+source_profile    = nunahealth
 role_session_name = alan
 region            = us-west-2
 
 [profile corp-public-experimental]
 role_arn          = arn:aws:iam::554390971234:role/default-tf-assume-role
-source_profile    = nunahealth-admin
+source_profile    = nunahealth
 role_session_name = alan
 region            = us-west-2
 
 [profile corp-infra-experimental]
 role_arn          = arn:aws:iam::418314167114:role/default-tf-assume-role
-source_profile    = nunahealth-admin
+source_profile    = nunahealth
 role_session_name = alan
 region            = us-west-2
 
 [profile corp-security-experimental]
 role_arn          = arn:aws:iam::444001135453:role/default-tf-assume-role
-source_profile    = nunahealth-admin
+source_profile    = nunahealth
 role_session_name = alan
 region            = us-west-2
 
 [profile corp-public-testing]
 role_arn          = arn:aws:iam::941629467279:role/default-tf-assume-role
-source_profile    = nunahealth-admin
+source_profile    = nunahealth
 role_session_name = alan
 region            = us-west-2
 
 [profile corp-security-testing]
 role_arn          = arn:aws:iam::788558185741:role/default-tf-assume-role
-source_profile    = nunahealth-admin
+source_profile    = nunahealth
 role_session_name = alan
 region            = us-west-2
 
 [profile corp-infra-testing]
 role_arn          = arn:aws:iam::899922345864:role/default-tf-assume-role
-source_profile    = nunahealth-admin
+source_profile    = nunahealth
 role_session_name = alan
 region            = us-west-2
-
-[profile nuroot]
-# NOTE: I noticed NuRoot does not set an alias like nunahealth does (see the AWS SSO login page)
-aws_account_id = 102297706502
-target_region = us-west-2
-
-[profile nucorp-parent]
-role_arn          = arn:aws:iam::310713536091:role/default-tf-assume-role
-source_profile    = nuroot
-
-[profile nucorp-public-testing]
-role_arn          = arn:aws:iam::577396812066:role/default-tf-assume-role
-source_profile    = nuroot
-
-[profile nucorp-security-testing]
-role_arn          = arn:aws:iam::560720567009:role/default-tf-assume-role
-source_profile    = nuroot
-
-[profile nucorp-infra-experimental]
-role_arn          = arn:aws:iam::146967607003:role/default-tf-assume-role
-source_profile    = nuroot
-
-[profile nucorp-infra-testing]
-role_arn          = arn:aws:iam::434281208410:role/default-tf-assume-role
-source_profile    = nuroot
-
-[profile nucorp-security-experimental]
-role_arn          = arn:aws:iam::572150182598:role/default-tf-assume-role
-source_profile    = nuroot
-
-[profile nucorp-public-stable]
-role_arn          = arn:aws:iam::559785372265:role/default-tf-assume-role
-source_profile    = nuroot
-
-[profile nucorp-infra-stable]
-role_arn          = arn:aws:iam::388280479850:role/default-tf-assume-role
-source_profile    = nuroot
-
-[profile nucorp-security-stable]
-role_arn          = arn:aws:iam::266110564225:role/default-tf-assume-role
-source_profile    = nuroot
-
-[profile nucorp-public-experimental]
-role_arn          = arn:aws:iam::274159521565:role/default-tf-assume-role
-source_profile    = nuroot
 
