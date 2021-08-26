@@ -20,10 +20,14 @@ $ruby\
 ${custom.vault}\
 [\ue0b0](bg:black fg:#333333)\
 $line_break\
+${custom.awsprofile}\
+${custom.tfbackend}\
+$line_break\
 $jobs\
 $time\
 $status\
-$character"""
+$character
+"""
 
 add_newline = false
 command_timeout = 1500
@@ -91,6 +95,18 @@ format = "[$time]($style)"
 
 [custom.vault]
 command = "echo $VAULT_ADDR | cut -d. -f2-4"  # shows output of command
-symbol = ""
+symbol = " "
 when = """ [[ $VAULT_ADDR =~ vault ]] """
-format = "[$symbol$output](bg:#333333 fg:#444444)"
+format = "[$symbol$output](bg:#333333 fg:#555555)"
+
+[custom.awsprofile]
+command = "echo $AWS_PROFILE"
+symbol = " "
+when = "[[ -n $AWS_PROFILE ]]"
+format = "[$symbol$output](bg:#333333 fg:#00FF00)[\ue0b0](bg:#222222 fg:#333333)"
+
+[custom.tfbackend]
+command = "jq -r .backend.config.key .terraform/terraform.tfstate"
+symbol = "行"
+when = "[[ -f .terraform/terraform.tfstate ]]"
+format = "[$symbol$output](bg:#222222 fg:#009900)[\ue0b0](fg:#222222)"
