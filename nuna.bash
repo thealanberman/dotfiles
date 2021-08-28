@@ -42,14 +42,6 @@ alias nawslst="aws --profile=lob-security-testing"
 alias nawslst="aws --profile=lob-security-testing"
 alias nawslst="aws --profile=lob-security-testing"
 
-### VAULT THINGS
-# export VAULT_ADDR=${VAULT_ADDR:-https://vault.int.nunahealth.com}
-# alias vth="vault-token-helper"
-
-# vault-login() {
-#   vault login -method=ldap username="${1:-$USER}" passcode="$(read -rp 'Yubikey tap: ' && echo ${REPLY})"
-# }
-
 daily() {
   nuna_access login
   prompty "login to all 3 vaults?" || return
