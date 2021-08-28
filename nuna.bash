@@ -19,13 +19,36 @@ alias ecr-login="aws ecr get-login-password --region us-west-2 | docker login --
 alias na="nuna_access"
 alias ap="awsprofiles"
 
-### VAULT THINGS
-export VAULT_ADDR=${VAULT_ADDR:-https://vault.int.nunahealth.com}
-alias vth="vault-token-helper"
+# NUNA AWS THINGS
+alias nawscie="aws --profile=corp-infra-experimental"
+alias nawscis="aws --profile=corp-infra-stable"
+alias nawscit="aws --profile=corp-infra-testing"
+alias nawscpe="aws --profile=corp-public-experimental"
+alias nawscps="aws --profile=corp-public-stable"
+alias nawscpt="aws --profile=corp-public-testing"
+alias nawscse="aws --profile=corp-security-experimental"
+alias nawscss="aws --profile=corp-security-stable"
+alias nawscst="aws --profile=corp-security-testing"
+alias nawslp="aws --profile=lob-parent"
+alias nawslpe="aws --profile=lob-product-experimental"
+alias nawslps="aws --profile=lob-product-stable"
+alias nawslpt="aws --profile=lob-product-testing"
+alias nawslse="aws --profile=lob-security-experimental"
+alias nawslss="aws --profile=lob-security-stable"
+alias nawslst="aws --profile=lob-product-testing"
+alias nawslst="aws --profile=lob-security-testing"
+alias nawslst="aws --profile=lob-security-testing"
+alias nawslst="aws --profile=lob-security-testing"
+alias nawslst="aws --profile=lob-security-testing"
+alias nawslst="aws --profile=lob-security-testing"
 
-vault-login() {
-  vault login -method=ldap username="${1:-$USER}" passcode="$(read -rp 'Yubikey tap: ' && echo ${REPLY})"
-}
+### VAULT THINGS
+# export VAULT_ADDR=${VAULT_ADDR:-https://vault.int.nunahealth.com}
+# alias vth="vault-token-helper"
+
+# vault-login() {
+#   vault login -method=ldap username="${1:-$USER}" passcode="$(read -rp 'Yubikey tap: ' && echo ${REPLY})"
+# }
 
 daily() {
   nuna_access login
@@ -59,7 +82,7 @@ ubuntu() {
 }
 
 awsprofiles () {
-  rg "\[profile" ${HOME}/.aws/config | cut -d' ' -f2 | sed 's/.$//'
+  rg "\[profile" ${HOME}/.aws/config | cut -d' ' -f2 | sed 's/.$//' | sort
 }
 
 idm () {
