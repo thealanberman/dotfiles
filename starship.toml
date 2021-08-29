@@ -20,7 +20,7 @@ ${custom.vault}\
 ${custom.awsprofile}\
 ${custom.tfbackend}\
 ${custom.tfenv}\
-$line_break\
+${custom.line_break}\
 $jobs\
 $time\
 $status\
@@ -119,10 +119,16 @@ format = '\[[$symbol$version]($style)\]'
 disabled = false
 format = '[$time]($style)'
 
+[custom.line_break]
+command = "true"
+when = '[[ "x$VAULT_ADDR$AWS_PROFILE$VAULT_TOKEN" != "x" ]] && [[ ! -d .terraform ]]'
+format = """[$output]()
+"""
+
 [custom.vault]
 command = "echo $VAULT_ADDR | cut -d/ -f3"  # shows output of command
 symbol = " "
-when = "[[ $VAULT_ADDR =~ vault ]]"
+when = "[[ -n $VAULT_ADDR ]]"
 format = '\[[$symbol$output]()\]'
 
 [custom.awsprofile]
