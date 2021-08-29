@@ -126,7 +126,7 @@ format = """[$output]()
 """
 
 [custom.vault]
-command = "echo $VAULT_ADDR | cut -d/ -f3"  # shows output of command
+command = "echo ${VAULT_ADDR##*/}" # trim off the https://
 symbol = " "
 when = "[[ -n $VAULT_ADDR ]]"
 format = '\[[$symbol$output]()\]'
