@@ -39,18 +39,18 @@ error_symbol = "[ ✖](bold red) ❯"
 disabled = false
 
 [username]
-format = " $user "
+format = " $user "
 disabled = false
 show_always = true
 
 [hostname]
-format = " $hostname "
+format = " $hostname "
 ssh_only = false
 trim_at = ""
 disabled = false
 
 [directory]
-format = " $path "
+format = " $path "
 truncation_length = 3
 truncate_to_repo = true
 # prefix = "in "
@@ -58,7 +58,7 @@ truncate_to_repo = true
 disabled = false
 
 [git_branch]
-format = " $symbol$branch"
+format = " $symbol$branch"
 symbol = " "
 
 [git_commit]
@@ -103,19 +103,19 @@ format = """[$output]()
 command = "echo ${VAULT_ADDR##*/}" # trim off the https://
 symbol = " "
 when = "[[ -n $VAULT_ADDR ]]"
-format = ' $symbol$output '
+format = ' $symbol$output '
 
 [custom.awsprofile]
 command = "echo $AWS_PROFILE"
 symbol = " "
 when = "[[ -n $AWS_PROFILE ]]"
-format = ' $symbol$output '
+format = ' $symbol$output '
 
 [custom.tfbackend]
 command = "jq -r .backend.config.key .terraform/terraform.tfstate"
 symbol = " "
 when = "[[ -f .terraform/terraform.tfstate ]]"
-format = ' $symbol$output '
+format = ' $symbol$output '
 
 [custom.vault_token]
 command = "echo Ⓣ"
