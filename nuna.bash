@@ -21,6 +21,7 @@ alias ap="awsprofiles"
 
 # NUNA AWS THINGS
 a(){
+  [[ $1 ]] || { echo "AWS_PROFILE=${AWS_PROFILE}"; return 1; }
   export AWS_PROFILE=$1
   if [[ $2 ]]; then
     shift
