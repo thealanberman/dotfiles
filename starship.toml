@@ -1,5 +1,6 @@
 # guide to powerline symbols https://awesomeopensource.com/project/ryanoasis/powerline-extra-symbols
 # guide to style strings https://starship.rs/advanced-config/#style-strings
+# 
 
 format = """
 $username\
@@ -14,46 +15,19 @@ $nodejs\
 $php\
 $python\
 $ruby\
+${custom.tfenv}\
+${custom.endcap}\
 $line_break\
 ${custom.vault_token}\
 ${custom.vault}\
 ${custom.awsprofile}\
 ${custom.tfbackend}\
-${custom.tfenv}\
-$line_break\
+${custom.line_break}\
 $jobs\
 $time\
 $status\
 $character
 """
-
-# format = """
-# $username\
-# [\ue0b0](bg:#333333 fg:#222222)\
-# $hostname\
-# [\ue0b0](bg:#444444 fg:#333333)\
-# $directory\
-# [\ue0b0](bg:#333333 fg:#444444)\
-# $git_branch\
-# $git_commit\
-# $git_state\
-# $git_status\
-# $golang\
-# $nodejs\
-# $php\
-# $python\
-# $ruby\
-# ${custom.vault}\
-# [\ue0b0](bg:black fg:#333333)\
-# $line_break\
-# ${custom.awsprofile}\
-# ${custom.tfbackend}\
-# $line_break\
-# $jobs\
-# $time\
-# $status\
-# $character
-# """
 
 add_newline = false
 command_timeout = 1500
@@ -65,18 +39,18 @@ error_symbol = "[ ✖](bold red) ❯"
 disabled = false
 
 [username]
-format = "[ $user ](bg:#222222)"
+format = " $user "
 disabled = false
 show_always = true
 
 [hostname]
-format = "[ $hostname ](bg:#333333)"
+format = " $hostname "
 ssh_only = false
 trim_at = ""
 disabled = false
 
 [directory]
-format = "[ $path ](bg:#444444)[$read_only](bg:#444444 $read_only_style)"
+format = " $path "
 truncation_length = 3
 truncate_to_repo = true
 # prefix = "in "
@@ -84,7 +58,7 @@ truncate_to_repo = true
 disabled = false
 
 [git_branch]
-format = "[ $symbol$branch ](bg:#333333 $style)"
+format = " $symbol$branch"
 symbol = " "
 
 [git_commit]
@@ -94,56 +68,78 @@ format = "[\\($hash\\)](bg:#333333 $style) [\\($tag\\)](bg:#333333 $style)"
 format = '\([$state( $progress_current/$progress_total)]()\)'
 
 [git_status]
-format = '[ $all_status ]($style)'
+format = '([\[$all_status$ahead_behind\]]($style))'
 
 [package]
 disabled = true
 
 [golang]
 symbol = " "
-format = '\[[$symbol$version]($style)\]'
+format = ' [$symbol$version]() '
 
 [nodejs]
 symbol = " "
-format = '\[[$symbol$version]($style)\]'
+format = ' [$symbol$version]() '
 
 [python]
 symbol = " "
-format = '\[[$symbol$version]($style)\]'
+format = ' [$symbol$version]() '
 
 [ruby]
 symbol = " "
-format = '\[[$symbol$version]($style)\]'
+format = ' [$symbol$version]() '
 
 [time]
 disabled = false
 format = '[$time]($style)'
 
+[custom.line_break]
+command = "true"
+when = '[[ "x$VAULT_ADDR$AWS_PROFILE$VAULT_TOKEN" != "x" ]] || [[ -f .terraform/terraform.tfstate ]]'
+format = """[$output]()
+"""
+
 [custom.vault]
-command = "echo $VAULT_ADDR | cut -d/ -f3"  # shows output of command
+command = "echo ${VAULT_ADDR##*/}" # trim off the https://
 symbol = " "
-when = "[[ $VAULT_ADDR =~ vault ]]"
-format = '\[[$symbol$output]()\]'
+when = "[[ -n $VAULT_ADDR ]]"
+format = ' $symbol$output '
 
 [custom.awsprofile]
 command = "echo $AWS_PROFILE"
 symbol = " "
 when = "[[ -n $AWS_PROFILE ]]"
-format = '\[[$symbol$output]()\]'
+format = ' $symbol$output '
 
 [custom.tfbackend]
 command = "jq -r .backend.config.key .terraform/terraform.tfstate"
 symbol = " "
 when = "[[ -f .terraform/terraform.tfstate ]]"
-format = '\[[$symbol$output]()\]'
+format = ' $symbol$output '
 
 [custom.vault_token]
 command = "echo Ⓣ"
 when = "[[ -n $VAULT_TOKEN ]]"
-format = '[$symbol$output ]()'
+format = '$output '
 
 [custom.tfenv]
 command = "cat /usr/local/Cellar/tfenv/2.2.2/version || cat ~/.tfenv/version"
 when = "[[ -d .terraform ]]"
-symbol = "tf"
-format = '\[[$symbol$output]()\]'
+symbol = " "
+format = ' [$symbol$output]() '
+
+[custom.endcap]
+description = "display  endcap when in a non-python/ruby/go/nodejs repo"
+command = 'echo '
+when = """
+if git rev-parse --is-inside-work-tree; then 
+  endcap=1
+else 
+  endcap=0
+fi
+
+(ls | egrep -q ".py$|.rb$|.js$|.go$|package.json") && endcap=0
+
+[[ $endcap == 1 ]]
+"""
+format = ' $output'

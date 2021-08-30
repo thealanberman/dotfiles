@@ -56,6 +56,7 @@ install_brew_apps()
     bash \
     bat \
     dc3dd \
+    git-delta \
     dockutil \
     fd \
     ffmpeg \
@@ -138,10 +139,13 @@ case $(uname) in
     install_brew_apps
     configure_vim
     make_symlinks
-    echo "export BASH_SILENCE_DEPRECATION_WARNING=1" >> "${HOME}/.bash_profile"
-    echo "for f in ${CWD}/*.bash; do source \${f}; done" >> "${HOME}/.bash_profile"
-    echo "export STARSHIP_CONFIG=${CWD}/starship.toml" >> "${HOME}/.bash_profile"
-    echo "eval \"\$(starship init bash)\"" >> "${HOME}/.bash_profile"
+    cat << EOF >> "${HOME}/.bash_profile"
+export HISTCONTROL=ignoreboth:erasedups
+source ${CWD}/customizations.bash
+[[ $USER == "alan" ]] && source ${CWD}/nuna.bash
+export STARSHIP_CONFIG=${CWD}/starship.toml
+eval "$(starship init bash)"
+EOF
     echo "REMEMBER: source ~/.bash_profile"
     ;;
   Linux)
@@ -158,9 +162,13 @@ case $(uname) in
     configure_vim
     make_symlinks
     install_linux_apps
-    echo "for f in ${CWD}/*.bash; do source \${f}; done" >> "${HOME}/.bashrc"
-    echo "export STARSHIP_CONFIG=${CWD}/starship.toml" >> "${HOME}/.bashrc"
-    echo "eval \"\$(starship init bash)\"" >> "${HOME}/.bashrc"
+    cat << EOF >> "${HOME}/.bashrc"
+export HISTCONTROL=ignoreboth:erasedups
+source ${CWD}/customizations.bash
+[[ $USER == "alan" ]] && source ${CWD}/nuna.bash
+export STARSHIP_CONFIG=${CWD}/starship.toml
+eval "$(starship init bash)"
+EOF
     echo "REMEMBER: source ~/.bashrc"
     ;;
   *)
