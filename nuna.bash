@@ -20,27 +20,13 @@ alias na="nuna_access"
 alias ap="awsprofiles"
 
 # NUNA AWS THINGS
-alias nawscie="aws --profile=corp-infra-experimental"
-alias nawscis="aws --profile=corp-infra-stable"
-alias nawscit="aws --profile=corp-infra-testing"
-alias nawscpe="aws --profile=corp-public-experimental"
-alias nawscps="aws --profile=corp-public-stable"
-alias nawscpt="aws --profile=corp-public-testing"
-alias nawscse="aws --profile=corp-security-experimental"
-alias nawscss="aws --profile=corp-security-stable"
-alias nawscst="aws --profile=corp-security-testing"
-alias nawslp="aws --profile=lob-parent"
-alias nawslpe="aws --profile=lob-product-experimental"
-alias nawslps="aws --profile=lob-product-stable"
-alias nawslpt="aws --profile=lob-product-testing"
-alias nawslse="aws --profile=lob-security-experimental"
-alias nawslss="aws --profile=lob-security-stable"
-alias nawslst="aws --profile=lob-product-testing"
-alias nawslst="aws --profile=lob-security-testing"
-alias nawslst="aws --profile=lob-security-testing"
-alias nawslst="aws --profile=lob-security-testing"
-alias nawslst="aws --profile=lob-security-testing"
-alias nawslst="aws --profile=lob-security-testing"
+a(){
+  export AWS_PROFILE=$1
+  if [[ $2 ]]; then
+    shift
+    aws $@
+  fi
+}
 
 ### VAULT THINGS
 # export VAULT_ADDR=${VAULT_ADDR:-https://vault.int.nunahealth.com}
