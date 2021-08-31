@@ -114,35 +114,31 @@ instance() {
   instancehelp() {
     printf "USAGE:\n\t"
     printf "instance search <name or partial name>\n\t"
-    printf "instance ami <name or partial name>\n\t"
+    printf "instance ami <name>\n\t"
     printf "instance delete <ids>\n\t"
-    printf "instance ssh <name or private IP>\n\t"
-    printf "instance ssh <service> <tier>\n\t"
     printf "instance packers (list+prompt to terminate all packer instances)\n"
   }
   case "${1}" in
     search)
-      awless list instances --filter name="${2}"
-      ;;
-    ssh)
-      [[ "${2}" ]] || { instancehelp; return 1; }
-      [[ "${3}" ]] && role="role=${2}-${3}" || role="foo"
-      local i
-      i=$(awless list instances --filter name="${2}" --tag "${role}" --columns name --no-headers --format csv)
-      awless ssh --private "${USER}@${i}"
+      aws ec2 describe-instances \
+        --filters Name=tag:Name,Values="*${2}*" \
+        --output table \
+        --query "Reservations[*].Instances[*].{name: Tags[?Key=='Name'] | [0].Value, instance_id: InstanceId, ip_address: PrivateIpAddress, state: State.Name}"
       ;;
     ami)
       local instance_id
-      instance_id=$(awless list instances --filter name="${2}" --ids | grep '^i-')
+      instance_id=$(aws ec2 describe-instances --filter Name=tag:Name,Values="${2}" --query "Reservations[].Instances[].InstanceId" --output text)
       aws ec2 describe-instances --instance-ids "${instance_id}" \
         --query "Reservations[0].Instances[0].ImageId" \
         --output text
       ;;
     delete)
-      awless delete instance ids="${2}"
+      aws ec2 terminate-instances --instance-ids"${2}"
       ;;
     packers)
-      awless list instances --filter name=packer,state=running || return
+      aws ec2 describe-instances \
+      --filters Name=tag:Name,Values=*packer* Name=instance-state-name,Values=running \
+      --output table || return
       prompty "Terminate all running Packer instances?" || return
       for i in $(awless list instances --filter name=packer,state=running --columns id,name,state --format json | jq -r .[].ID); do 
         awless delete instance -f --no-sync id="${i}"
