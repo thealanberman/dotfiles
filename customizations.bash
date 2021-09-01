@@ -310,3 +310,11 @@ a2v() {
   -acodec copy -r 1 -shortest \
   "${outfile%.*}.mp4"
 }
+
+# because dig on macOS behaves differently
+alias dnsquery='dscacheutil -q host -a name'
+dig() { 
+  [[ $UNAME == "Darwin" ]] && echo "$(tput bold)macOS detected. Try 'dnsquery' instead.$(tput sgr0)"
+  /usr/bin/dig $@
+  [[ $UNAME == "Darwin" ]] && echo "$(tput bold)macOS detected. Try 'dnsquery' instead.$(tput sgr0)"
+} 
