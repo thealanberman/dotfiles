@@ -127,7 +127,11 @@ instance() {
       ;;
     ami)
       local instance_id
-      instance_id=$(aws ec2 describe-instances --filter Name=tag:Name,Values="${2}" --query "Reservations[].Instances[].InstanceId" --output text)
+      if [[ "${2}" =~ ^i- ]]; then
+        instance_id="${2}"
+      else
+        instance_id=$(aws ec2 describe-instances --filter Name=tag:Name,Values="${2}" --query "Reservations[].Instances[].InstanceId" --output text)
+      fi
       aws ec2 describe-instances --instance-ids "${instance_id}" \
         --query "Reservations[0].Instances[0].ImageId" \
         --output text
