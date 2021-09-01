@@ -51,7 +51,7 @@ disabled = false
 
 [directory]
 format = " $path "
-truncation_length = 3
+# truncation_length = 3
 truncate_to_repo = true
 # prefix = "in "
 # style = "bold cyan"
