@@ -18,6 +18,7 @@ alias cfrun="docker run cfrun"
 alias ecr-login="aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 254566265011.dkr.ecr.us-west-2.amazonaws.com"
 alias na="nuna_access"
 alias ap="awsprofiles"
+alias tokens="jq -r .tokens ~/.config/nuna/vault_store.json | sed -E 's/\"//g'"
 
 # NUNA AWS THINGS
 a(){
