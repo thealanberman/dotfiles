@@ -16,18 +16,35 @@ alias deployments="cd \${NUNA_ROOT}/configs/nunahealth/aws/cloudformation/deploy
 alias ws="ssh -A alan.ws.int.nunahealth.com"
 alias cfrun="docker run cfrun"
 alias ecr-login="aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 254566265011.dkr.ecr.us-west-2.amazonaws.com"
-alias na="nuna_access"
+# alias na="nuna_access"
 alias ap="awsprofiles"
 alias tokens="jq -r .tokens ~/.config/nuna/vault_store.json | sed -E 's/\"//g'"
 
 # NUNA AWS THINGS
 a(){
   [[ $1 ]] || { echo "AWS_PROFILE=${AWS_PROFILE}"; return 1; }
+  [[ $1 == "unset" ]] && { unset AWS_PROFILE; return; }
   export AWS_PROFILE=$1
-  if [[ $2 ]]; then
-    shift
-    aws $@
-  fi
+}
+
+na() {
+  case ${1} in
+    env)
+      export AWS_ACCESS_KEY_ID=$(nuna_access aws sts --profile lob-product-stable --role poweruser | jq -r .AccessKeyId)
+      export AWS_SECRET_ACCESS_KEY=$(nuna_access aws sts --profile lob-product-stable --role poweruser | jq -r .SecretAccessKey)
+      export AWS_SESSION_TOKEN=$(nuna_access aws sts --profile lob-product-stable --role poweruser | jq -r .SessionToken)
+      echo "exported: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN"
+      ;;
+    unset)
+      unset AWS_ACCESS_KEY_ID
+      unset AWS_SECRET_ACCESS_KEY
+      unset AWS_SESSION_TOKEN
+      echo "unsetted"
+      ;;
+    *)
+      nuna_access $@
+      ;;
+  esac
 }
 
 daily() {
