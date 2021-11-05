@@ -30,15 +30,17 @@ a(){
 na() {
   case ${1} in
     env)
-      export AWS_ACCESS_KEY_ID=$(nuna_access aws sts --profile lob-product-stable --role poweruser | jq -r .AccessKeyId)
-      export AWS_SECRET_ACCESS_KEY=$(nuna_access aws sts --profile lob-product-stable --role poweruser | jq -r .SecretAccessKey)
-      export AWS_SESSION_TOKEN=$(nuna_access aws sts --profile lob-product-stable --role poweruser | jq -r .SessionToken)
-      echo "exported: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN"
+      export AWS_DEFAULT_REGION="us-west-2"
+      export AWS_ACCESS_KEY_ID=$(nuna_access aws sts --profile "${2:-lob-product-stable}" --role poweruser | jq -r .AccessKeyId)
+      export AWS_SECRET_ACCESS_KEY=$(nuna_access aws sts --profile "${2:-lob-product-stable}" --role poweruser | jq -r .SecretAccessKey)
+      export AWS_SESSION_TOKEN=$(nuna_access aws sts --profile "${2:-lob-product-stable}" --role poweruser | jq -r .SessionToken)
+      echo "exported: AWS_DEFAULT_REGION, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN"
       ;;
     unset)
       unset AWS_ACCESS_KEY_ID
       unset AWS_SECRET_ACCESS_KEY
       unset AWS_SESSION_TOKEN
+      unset AWS_DEFAULT_REGION
       echo "unsetted"
       ;;
     *)
@@ -91,43 +93,6 @@ nuna() {
   which code || "${EDITOR}" "${DOTFILES}/nuna.bash" && code "${DOTFILES}/nuna.bash"
 }
 
-sandbox() {
-    sandbox_help() {
-            echo "USAGE:"
-            echo "  sandbox <status|up|ssh|stop> [username]"
-            echo "  Default username: ${USER}"
-    }
-    sandbox_name="${2:-${USER}}"
-    aws sts get-caller-identity &> /dev/null || { echo "ERROR: Auth first!"; return 1; }
-    sandbox_instance_id="$(aws cloudformation describe-stack-resource --stack-name CommercialSandboxStateless-"${sandbox_name}" --logical-resource-id CommercialSandboxInstance --query 'StackResourceDetail.PhysicalResourceId' --output text)"
-    case "${1}" in
-        status)
-            echo -n "Sandbox ${sandbox_name}.sandbox.int.nunahealth.com is: "
-            aws ec2 describe-instance-status --instance-ids "${sandbox_instance_id}" --query "InstanceStatuses[0].InstanceState.Name" --output text
-            ;;
-        stop|halt)
-            echo "Stopping Sandbox ${sandbox_name}.sandbox.int.nunahealth.com..."
-            aws ec2 stop-instances --instance-ids "${sandbox_instance_id}"
-            aws ec2 wait instance-stopped --instance-ids "${sandbox_instance_id}" && \
-            echo "Sandbox is now stopped."
-            ;;
-        start|up)
-            aws ec2 start-instances --instance-ids "${sandbox_instance_id}" && \
-            echo "Waiting for Sandbox ${sandbox_name}.sandbox.int.nunahealth.com to start..."
-            aws ec2 wait instance-running --instance-ids "${sandbox_instance_id}" && \
-            echo "Sandbox is now running."
-            ;;
-        connect|ssh)
-            pgrep -q ssh-agent || ssh-yubi
-            ssh -A -o ConnectTimeout=1 "${sandbox_name}.sandbox.int.nunahealth.com" \
-                || echo "ERROR: Can't reach host. Check VPN connection?"
-            ;;
-        *)
-            sandbox_help
-            ;;
-    esac
-}
-
 instance() {
   instancehelp() {
     printf "USAGE:\n\t"
@@ -155,15 +120,20 @@ instance() {
         --output text
       ;;
     delete)
-      aws ec2 terminate-instances --instance-ids"${2}"
+      aws ec2 terminate-instances --instance-ids "${2}"
       ;;
     packers)
       aws ec2 describe-instances \
-      --filters Name=tag:Name,Values=*packer* Name=instance-state-name,Values=running \
-      --output table || return
+        --filters Name=tag:Name,Values=*Packer* Name=instance-state-name,Values=running \
+        --query "Reservations[*].Instances[*].{name: Tags[?Key=='Name'] | [0].Value, instance_id: InstanceId, ip_address: PrivateIpAddress, state: State.Name, launched: LaunchTime}" \
+        --output table || return
       prompty "Terminate all running Packer instances?" || return
-      for i in $(awless list instances --filter name=packer,state=running --columns id,name,state --format json | jq -r .[].ID); do 
-        awless delete instance -f --no-sync id="${i}"
+      for i in $(aws ec2 describe-instances \
+                  --filters Name=tag:Name,Values=*Packer* Name=instance-state-name,Values=running \
+                  --query "Reservations[*].Instances[*].InstanceId" \
+                  --output text)
+      do 
+        aws ec2 terminate-instances --instance-ids "${i}"
       done
       ;;
     *)
