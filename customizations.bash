@@ -262,6 +262,24 @@ audio_join() {
   ffmpeg -i "concat:${1}|${2}" -c copy "${3}"
 }
 
+audio_extract() {
+  [[ ${1} ]] || {
+    echo "Usage: audio_extract <video file>"
+    return 1
+  }
+  fmt=$(ffprobe "${1}" 2>&1 | sed -En 's/.*Audio: (...).*/\1/p')
+
+  if [[ "${fmt}" == "aac" ]]; then
+    ffmpeg -i "${1}" -vn -acodec copy "${1%.*}.m4a"
+    echo "Output: ${1%.*}.m4a"
+  elif [[ $fmt == "mp3" ]]; then
+    ffmpeg -i "${1}" -vn -acodec copy "${1%.*}.mp3"
+    echo "Output: ${1%.*}.mp3"
+  else
+    echo "not sure what extension to use for ${fmt}"
+  fi
+}
+
 hashafter() {
   { [[ $1 ]] && [[ $2 ]]; } || {
     echo "Check SHA sum of all files after line N."
