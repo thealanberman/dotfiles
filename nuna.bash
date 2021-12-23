@@ -19,6 +19,8 @@ alias ecr-login="aws ecr get-login-password --region us-west-2 | docker login --
 # alias na="nuna_access"
 alias ap="awsprofiles"
 alias tokens="jq -r .tokens ~/.config/nuna/vault_store.json | sed -E 's/\"//g'"
+alias stable="sshuttle_wrapper stable"
+alias testing="sshuttle_wrapper testing"
 
 # NUNA AWS THINGS
 a(){
