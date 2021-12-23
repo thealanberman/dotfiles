@@ -318,3 +318,10 @@ dig() {
   /usr/bin/dig $@
   [[ $UNAME == "Darwin" ]] && echo "$(tput bold)macOS detected. Try 'dnsquery' instead.$(tput sgr0)"
 } 
+
+fix() {
+  echo -e "AUDIO:\n\tsudo launchctl kickstart -kp system/com.apple.audio.coreaudiod"
+  echo
+  echo -e "BLUETOOTH:\n\tsudo launchctl kickstart -kp system/com.apple.audio.bluetoothd"
+  echo
+}
