@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+export PATH="/usr/local/sbin:${PATH}"
+
 if [[ ! "${GOPATH}" ]]; then
   if [[ -d "${HOME}/code/go" ]]; then
     export GOPATH="${HOME}/code/go"
@@ -15,6 +17,13 @@ fi
 
 if [[ $(command -v mcfly) ]]; then
   eval "$(mcfly init bash)"
+fi
+
+if [[ $(command -v pyenv) ]]; then
+  export PYENV_ROOT="$HOME/.pyenv"
+  export PATH="$PYENV_ROOT/bin:$PATH"
+  eval "$(pyenv init --path)"
+  eval "$(pyenv init -)"
 fi
 
 # Enable asdf -- https://github.com/asdf-vm/asdf
