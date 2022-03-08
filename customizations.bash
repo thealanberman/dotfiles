@@ -304,7 +304,7 @@ ramdisk() {
     return 1
   }
   ramdisk_size=$((${1} * 2048))
-  diskutil erasevolume HFS+ 'RAMDisk' "$(hdiutil attach -nobrowse -nomount ram://${ramdisk_size})"
+  diskutil erasevolume HFS+ 'RAMDisk' $(hdiutil attach -nobrowse -nomount ram://${ramdisk_size})
 }
 
 splay() {
@@ -351,4 +351,16 @@ fix() {
   echo
   echo -e "BLUETOOTH:\n\tsudo launchctl kickstart -kp system/com.apple.audio.bluetoothd"
   echo
+}
+
+heardle() {
+  folder=${HOME}/Desktop/$(date +%Y%m%d)
+  mkdir -p "${folder}"
+  ffmpeg -i "${1}" -ss 00:00:00 -to 00:00:01 -vn -map_metadata -1 ${folder}/01.mp3
+  ffmpeg -i "${1}" -ss 00:00:00 -to 00:00:02 -vn -map_metadata -1 ${folder}/02.mp3
+  ffmpeg -i "${1}" -ss 00:00:00 -to 00:00:04 -vn -map_metadata -1 ${folder}/03.mp3
+  ffmpeg -i "${1}" -ss 00:00:00 -to 00:00:08 -vn -map_metadata -1 ${folder}/04.mp3
+  ffmpeg -i "${1}" -ss 00:00:00 -to 00:00:16 -vn -map_metadata -1 ${folder}/05.mp3
+  shift 1
+  echo "${@}" > "${folder}/answer.txt"
 }
