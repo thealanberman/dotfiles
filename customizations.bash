@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# dedupe bash history, ignore commands with leading space
+export HISTCONTROL=ignoreboth:erasedups
+
 export PATH="/usr/local/sbin:${PATH}"
 
 if [[ ! "${GOPATH}" ]]; then
