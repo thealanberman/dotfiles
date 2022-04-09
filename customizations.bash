@@ -292,6 +292,21 @@ audio_extract() {
   fi
 }
 
+subtitle_extract() {
+  [[ ${1} ]] || {
+    echo "Usage: subtitle_extract <video file>"
+    return 1
+  }
+  fmt=$(ffprobe "${1}" 2>&1 | sed -En 's/.*Subtitle: (...).*/\1/p')
+
+  if [[ "${fmt}" == "subrip" ]]; then
+    ffmpeg -i "${1}" -map 0:s:0 "${1%.*}.srt"
+    echo "Output: ${1%.*}.srt"
+  else
+    echo "not sure what extension to use for ${fmt}"
+  fi
+}
+
 hashafter() {
   { [[ $1 ]] && [[ $2 ]]; } || {
     echo "Check SHA sum of all files after line N."
