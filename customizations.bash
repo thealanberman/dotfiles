@@ -382,3 +382,8 @@ heardle() {
   shift 1
   echo "${@}" > "${folder}/answer.txt"
 }
+
+k() {
+  [[ -z $1 ]] && { echo "USAGE: k <unique NAME of keychain entry>"; return 1; }
+ security find-generic-password -w -l "${1}" | pbcopy && echo "password copied to clipboard"
+}
