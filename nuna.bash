@@ -13,7 +13,7 @@ export TF_PLUGIN_CACHE_DIR="${HOME}/.terraform.d/plugin-cache"
 
 alias analytics="cd \${NUNA_ROOT}"
 alias deployments="cd \${NUNA_ROOT}/configs/nunahealth/aws/cloudformation/deployments"
-alias ws="ssh -A alan.ws.int.nunahealth.com"
+alias ws="ssh -A alan.ws.nuna.cloud"
 alias cfrun="docker run cfrun"
 alias ecr-login="aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 254566265011.dkr.ecr.us-west-2.amazonaws.com"
 # alias na="nuna_access"
@@ -52,12 +52,9 @@ na() {
 }
 
 daily() {
-  nuna_access login
-  prompty "login to all 3 vaults?" || return
-  VAULT_ADDR=https://vault.int.nunahealth.com vault login -method=ldap username="${1:-$USER}" passcode="$(read -rp 'Yubikey tap: ' && echo ${REPLY})"
-  VAULT_ADDR=https://vault.staging.nuna.health vault login -method=ldap username="${1:-$USER}" passcode="$(read -rp 'Yubikey tap: ' && echo ${REPLY})"
-  VAULT_ADDR=https://vault.nuna.health vault login -method=ldap username="${1:-$USER}" passcode="$(read -rp 'Yubikey tap: ' && echo ${REPLY})"
-  VAULT_ADDR=https://vault.testing.nuna.cloud vault login -method=ldap -path=ldap/ad username="${1:-$USER}" passcode="$(read -rp 'Yubikey tap: ' && echo ${REPLY})"
+  nuna_access login -r admin --all-enclaves
+  echo "Syncing nuna_access credentials to ${USER}.ws.nuna.cloud"
+  scp ${HOME}/.config/nuna/*.json ${USER}.ws.nuna.cloud:/home/${USER}/.config/nuna
 }
 
 ec2user() {
