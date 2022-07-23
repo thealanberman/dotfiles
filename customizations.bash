@@ -279,20 +279,27 @@ audio_extract() {
     echo "Usage: audio_extract <video file>"
     return 1
   }
-  fmt=$(ffprobe "${1}" 2>&1 | sed -En 's/.*Audio: (...).*/\1/p')
 
-  if [[ "${fmt}" == "aac" ]]; then
-    ffmpeg -i "${1}" -vn -acodec copy "${1%.*}.m4a"
-    echo "Output: ${1%.*}.m4a"
-  elif [[ $fmt == "mp3" ]]; then
-    ffmpeg -i "${1}" -vn -acodec copy "${1%.*}.mp3"
-    echo "Output: ${1%.*}.mp3"
-  elif [[ $fmt == "eac" ]]; then
-    ffmpeg -i "${1}" -vn -acodec copy "${1%.*}.ac3"
-    echo "Output: ${1%.*}.ac3"  
-  else
-    echo "not sure what extension to use for ${fmt}"
+  declare -A audioFormat
+  audioFormat[aac]="m4a"
+  audioFormat[mp3]="mp3"
+  audioFormat[eac]="ac3"
+
+  fmt=$(ffprobe "${1}" 2>&1 | grep -m1 "Audio" | sed -En 's/.*Audio: (...).*/\1/p')
+  ffmpeg -i "${1}" -vn -acodec copy "${1%.*}.${audioFormat[${fmt}]}"
+  echo "Output: ${1%.*}.${audioFormat[${fmt}]}"
+}
+
+audio_chunk() {
+  if [[ -z ${1} ]] || [[ -z ${2} ]]; then
+    echo "Usage: audio_chunk <audio file> <number of chunks>"
+    return 1
   fi
+
+  seconds=$(ffprobe -i "${1}" -show_entries format=duration -v quiet -of csv="p=0")
+  roundedup="$(printf "%.0f\n" "${seconds}")"
+  segment_length=$(( (roundedup + 1) / ${2} ))
+  ffmpeg -i "${1}" -f segment -segment_time "${segment_length}" "output_%03d.${1##*.}"
 }
 
 subtitle_extract() {
