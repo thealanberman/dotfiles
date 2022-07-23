@@ -287,6 +287,9 @@ audio_extract() {
   elif [[ $fmt == "mp3" ]]; then
     ffmpeg -i "${1}" -vn -acodec copy "${1%.*}.mp3"
     echo "Output: ${1%.*}.mp3"
+  elif [[ $fmt == "eac" ]]; then
+    ffmpeg -i "${1}" -vn -acodec copy "${1%.*}.ac3"
+    echo "Output: ${1%.*}.ac3"  
   else
     echo "not sure what extension to use for ${fmt}"
   fi
