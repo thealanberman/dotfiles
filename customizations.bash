@@ -379,6 +379,7 @@ fix() {
   echo
   echo -e "BLUETOOTH:\n\tsudo launchctl kickstart -kp system/com.apple.audio.bluetoothd"
   echo
+  echo -e "ICONS:\n\tsudo pkill com.apple.quicklook.ThumbnailsAgent; sudo killall Finder"
 }
 
 heardle() {
