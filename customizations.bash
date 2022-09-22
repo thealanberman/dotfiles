@@ -43,6 +43,11 @@ export DOTFILES="${HOME}/code/dotfiles"
 export EDITOR="vim"
 
 # --------------------------------- #
+# PAGER
+# --------------------------------- #
+export PAGER="less -X"
+
+# --------------------------------- #
 # AWS PAGER
 # --------------------------------- #
 export AWS_PAGER=""
