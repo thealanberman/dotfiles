@@ -64,7 +64,8 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias df='df -H'
 alias ff='fd'
-alias yta="youtube-dl --ignore-errors --yes-playlist --format m4a"
+# alias yta="youtube-dl --ignore-errors --yes-playlist --format m4a"
+alias yta="yt-dlp -x --audio-format m4a"
 alias now="date +%Y%m%dT%H%M%S"
 alias reload="source ~/.bashrc" # overridden later if Darwin
 alias timestamp="now"
@@ -298,7 +299,7 @@ audio_chunk() {
 
   seconds=$(ffprobe -i "${1}" -show_entries format=duration -v quiet -of csv="p=0")
   roundedup="$(printf "%.0f\n" "${seconds}")"
-  segment_length=$(( (roundedup + 1) / ${2} ))
+  segment_length=$(((roundedup + 1) / ${2}))
   ffmpeg -i "${1}" -f segment -segment_time "${segment_length}" "output_%03d.${1##*.}"
 }
 
@@ -353,26 +354,26 @@ loop() {
 }
 
 a2v() {
-  [[ $1 ]] || { 
+  [[ $1 ]] || {
     echo "Audio 2 Video"
     echo "USAGE: a2v <image file> <audio file>"
     return 1
-    }
+  }
   outfile=$(basename "${2}" | tr -d " ")
   ffmpeg -r 1 -loop 1 \
-  -i "${1}" \
-  -i "${2}" \
-  -acodec copy -r 1 -shortest \
-  "${outfile%.*}.mp4"
+    -i "${1}" \
+    -i "${2}" \
+    -acodec copy -r 1 -shortest \
+    "${outfile%.*}.mp4"
 }
 
 # because dig on macOS behaves differently
 alias dnsquery='dscacheutil -q host -a name'
-dig() { 
+dig() {
   [[ $UNAME == "Darwin" ]] && echo "$(tput bold)macOS detected. Try 'dnsquery' instead.$(tput sgr0)"
   /usr/bin/dig $@
   [[ $UNAME == "Darwin" ]] && echo "$(tput bold)macOS detected. Try 'dnsquery' instead.$(tput sgr0)"
-} 
+}
 
 fix() {
   echo -e "AUDIO:\n\tsudo launchctl kickstart -kp system/com.apple.audio.coreaudiod"
@@ -391,10 +392,13 @@ heardle() {
   ffmpeg -i "${1}" -ss 00:00:00 -to 00:00:08 -vn -map_metadata -1 ${folder}/04.mp3
   ffmpeg -i "${1}" -ss 00:00:00 -to 00:00:16 -vn -map_metadata -1 ${folder}/05.mp3
   shift 1
-  echo "${@}" > "${folder}/answer.txt"
+  echo "${@}" >"${folder}/answer.txt"
 }
 
 k() {
-  [[ -z $1 ]] && { echo "USAGE: k <unique NAME of keychain entry>"; return 1; }
- security find-generic-password -w -l "${1}" | pbcopy && echo "password copied to clipboard"
+  [[ -z $1 ]] && {
+    echo "USAGE: k <unique NAME of keychain entry>"
+    return 1
+  }
+  security find-generic-password -w -l "${1}" | pbcopy && echo "password copied to clipboard"
 }
