@@ -5,6 +5,8 @@ export HISTCONTROL=ignoreboth:erasedups
 
 export PATH="/usr/local/sbin:${PATH}"
 
+export AWS_CLI_AUTO_PROMPT=on-partial
+
 if [[ ! "${GOPATH}" ]]; then
   if [[ -d "${HOME}/code/go" ]]; then
     export GOPATH="${HOME}/code/go"
