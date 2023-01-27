@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env zsh
 export MFA_STS_DURATION=53200
 export NUNA_ROOT="${HOME}/code/analytics"
 export VAULT_ROOT="${HOME}/code/vault"
@@ -58,32 +58,10 @@ na() {
 }
 
 daily() {
-  /Applications/Tailscale.app/Contents/MacOS/Tailscale login --shields-up
+  # /Applications/Tailscale.app/Contents/MacOS/Tailscale login --shields-up
   nuna_access login -r admin --all-enclaves
   echo "Syncing nuna_access credentials to ${USER}.ws.nuna.cloud"
   scp ${HOME}/.config/nuna/*.json ${USER}.ws.nuna.cloud:/home/${USER}/.config/nuna
-}
-
-ec2user() {
-  nuprod -e "${1}" -u ubuntu && nuprod -e "${1}" -u ec2-user
-  if [[ "${2}" ]] && [[ "${1}" == "testing" ]]; then
-    ssh -A -J ubuntu@bastion.staging.nuna.health "ec2-user@${2}"
-  elif [[ "${2}" ]] && [[ "${1}" == "stable" ]]; then
-    ssh -A -J ubuntu@bastion.nuna.health "ec2-user@${2}"
-  else
-    echo "USAGE: ec2user <enclave> <IP>"
-  fi
-}
-
-ubuntu() {
-  nuprod -e "${1}" -u ubuntu
-  if [[ "${2}" ]] && [[ "${1}" == "testing" ]]; then
-    ssh -A -J ubuntu@bastion.staging.nuna.health "ubuntu@${2}"
-  elif [[ "${2}" ]] && [[ "${1}" == "stable" ]]; then
-    ssh -A -J ubuntu@bastion.nuna.health "ubuntu@${2}"
-  else
-    echo "USAGE: ubuntu <enclave> <IP>"
-  fi
 }
 
 awsprofiles() {
@@ -99,7 +77,7 @@ idm() {
 }
 
 nuna() {
-  which code || "${EDITOR}" "${DOTFILES}/nuna.bash" && code "${DOTFILES}/nuna.bash"
+  which code || "${EDITOR}" "${DOTFILES}/nuna.zsh" && code "${DOTFILES}/nuna.zsh"
 }
 
 instance() {
@@ -146,43 +124,6 @@ instance() {
     ;;
   *)
     instancehelp
-    ;;
-  esac
-}
-
-stack() {
-  stackhelp() {
-    printf "USAGE:\n\t"
-    printf "stack search <search term>\n\t"
-    printf "stack info <stack name>\n\t"
-    printf "stack ami <stack name>\n\t"
-    printf "stack delete <stack name>\n"
-  }
-  [ -z "${2}" ] && {
-    stackhelp
-    return 1
-  }
-  case "${1}" in
-  delete)
-    set -x
-    aws cloudformation delete-stack --stack-name "${2}"
-    { set +x; } 2>&-
-    echo "Waiting for confirmation..."
-    aws cloudformation wait stack-delete-complete --stack-name "${2}" && echo "${2} Deleted."
-    ;;
-  search)
-    awless list stacks --filter name="${2}"
-    ;;
-  ami)
-    aws cloudformation describe-stacks --stack-name "${2}" \
-      --query "Stacks[0].Parameters[?ParameterKey=='ImageId'].ParameterValue" \
-      --output text
-    ;;
-  info | show | status)
-    awless show "${2}"
-    ;;
-  *)
-    stackhelp
     ;;
   esac
 }

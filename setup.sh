@@ -12,17 +12,15 @@ set -o pipefail
 # set -o xtrace # set -x
 
 # get current working directory
-CWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+CWD="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-append_inputrc()
-{
+append_inputrc() {
   if ! grep -q "history-search-forward" "${HOME}/.inputrc"; then
     cp "${CWD}/.inputrc" "${HOME}"
   fi
 }
 
-make_symlinks()
-{
+make_symlinks() {
   echo "[ Making Symlinks ]"
   ln -fs "${CWD}/.inputrc" "${HOME}/"
   ln -fs "${CWD}/.tmux.conf" "${HOME}/"
@@ -30,16 +28,14 @@ make_symlinks()
   ln -s "${CWD}/prompty" "/usr/local/bin/"
 }
 
-configure_vim()
-{
+configure_vim() {
   echo "[ Configuring Vim ]"
   mkdir -p "${HOME}/.vim/pack/default/start"
   git clone https://github.com/morhetz/gruvbox.git "${HOME}/.vim/pack/default/start/gruvbox"
   git clone https://github.com/sheerun/vim-polyglot "${HOME}/.vim/pack/default/start/vim-polyglot"
 }
 
-install_homebrew()
-{
+install_homebrew() {
   echo "[ Installing Homebrew ]"
   read -e -s -p "Install Homebrew [y/N]? " -n 1 -r
   if [[ "${REPLY}" =~ ^[Yy]$ ]]; then
@@ -47,56 +43,50 @@ install_homebrew()
   fi
 }
 
-install_brew_apps()
-{
+install_brew_apps() {
   read -e -s -p "Install Homebrew apps [y/N]? " -n 1 -r
   if [[ "${REPLY}" =~ ^[Yy]$ ]]; then
     brew install \
-    awless \
-    bash \
-    bat \
-    dc3dd \
-    git-delta \
-    dockutil \
-    fd \
-    ffmpeg \
-    git \
-    golang \
-    grep \
-    highlight \
-    lazydocker \
-    jq \
-    mcfly \
-    mtr \
-    openssh \
-    openssl \
-    pipx \
-    pipenv \
-    psgrep \
-    pv \
-    python \
-    ripgrep \
-    ruby \
-    shellcheck \
-    starship \
-    tfenv \
-    tldr \
-    tmux \
-    tree \
-    vim \
-    wget \
-    youtube-dl \
-    yq
+      bat \
+      dc3dd \
+      git-delta \
+      fd \
+      ffmpeg \
+      git \
+      golang \
+      grep \
+      highlight \
+      lazydocker \
+      jq \
+      mcfly \
+      mtr \
+      openssh \
+      openssl \
+      pipx \
+      pipenv \
+      psgrep \
+      pv \
+      python \
+      ripgrep \
+      ruby \
+      shellcheck \
+      starship \
+      tfenv \
+      tldr \
+      tmux \
+      tree \
+      vim \
+      wget \
+      youtube-dl \
+      yq
   fi
 }
 
-get_latest_version()
-{
+get_latest_version() {
   curl --silent "${1}/releases/latest" | grep -Eo '[0-9]+.[0-9]+.[0-9]+'
 }
 
-install_linux_apps()
-{
+install_linux_apps() {
   echo "[ Installing apps ]"
 
   # golang apps
@@ -113,7 +103,7 @@ install_linux_apps()
     curl -sL "https://github.com/sharkdp/bat/releases/download/v${version}/bat-musl_${version}_amd64.deb" -o /tmp/bat.deb
     sudo dpkg -i /tmp/bat.deb
   }
-  
+
   which fd || {
     version=$(get_latest_version https://github.com/sharkdp/fd)
     curl -sL "https://github.com/sharkdp/fd/releases/download/v${version}/fd-musl_${version}_amd64.deb" -o /tmp/fd.deb
@@ -131,47 +121,47 @@ install_linux_apps()
   }
 }
 
-case $(uname) in 
-  Darwin)
-    append_inputrc
-    xcode-select --install
-    install_homebrew
-    install_brew_apps
-    configure_vim
-    make_symlinks
-    cat << EOF >> "${HOME}/.bash_profile"
+case $(uname) in
+Darwin)
+  append_inputrc
+  xcode-select --install
+  install_homebrew
+  install_brew_apps
+  configure_vim
+  make_symlinks
+  cat <<EOF >>"${HOME}/.bash_profile"
 export HISTCONTROL=ignoreboth:erasedups
 source ${CWD}/customizations.bash
 [[ $USER == "alan" ]] && source ${CWD}/nuna.bash
 export STARSHIP_CONFIG=${CWD}/starship.toml
 eval "$(starship init bash)"
 EOF
-    echo "REMEMBER: source ~/.bash_profile"
-    ;;
-  Linux)
-    append_inputrc
-    sudo apt-get update
-    sudo apt-get install \
-      git \
-      docker \
-      docker-compose \
-      fzf \
-      shellcheck \
-      golang-go \
-      tmux
-    configure_vim
-    make_symlinks
-    install_linux_apps
-    cat << EOF >> "${HOME}/.bashrc"
+  echo "REMEMBER: source ~/.bash_profile"
+  ;;
+Linux)
+  append_inputrc
+  sudo apt-get update
+  sudo apt-get install \
+    git \
+    docker \
+    docker-compose \
+    fzf \
+    shellcheck \
+    golang-go \
+    tmux
+  configure_vim
+  make_symlinks
+  install_linux_apps
+  cat <<EOF >>"${HOME}/.bashrc"
 export HISTCONTROL=ignoreboth:erasedups
 source ${CWD}/customizations.bash
 [[ $USER == "alan" ]] && source ${CWD}/nuna.bash
 export STARSHIP_CONFIG=${CWD}/starship.toml
 eval "$(starship init bash)"
 EOF
-    echo "REMEMBER: source ~/.bashrc"
-    ;;
-  *)
-    printf "ERROR: uname reports this OS is %s. Exiting." "$(uname)"
+  echo "REMEMBER: source ~/.bashrc"
+  ;;
+*)
+  printf "ERROR: uname reports this OS is %s. Exiting." "$(uname)"
   ;;
 esac

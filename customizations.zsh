@@ -1,11 +1,15 @@
-#!/usr/bin/env bash
+#!/usr/bin/env zsh
 
-# dedupe bash history, ignore commands with leading space
+# dedupe history, ignore commands with leading space
 export HISTCONTROL=ignoreboth:erasedups
 
 export PATH="/usr/local/sbin:${PATH}"
 
-export AWS_CLI_AUTO_PROMPT=on-partial
+# pasted URLs are automatically quoted, without needing to disable globbing
+autoload -Uz bracketed-paste-magic
+zle -N bracketed-paste bracketed-paste-magic
+autoload -Uz url-quote-magic
+zle -N self-insert url-quote-magic
 
 if [[ ! "${GOPATH}" ]]; then
   if [[ -d "${HOME}/code/go" ]]; then
@@ -21,7 +25,8 @@ if [[ $(command -v cargo) ]]; then
 fi
 
 if [[ $(command -v mcfly) ]]; then
-  eval "$(mcfly init ${SHELL##/*/})"
+  HISTFILE=${HOME}/.zsh_history
+  eval "$(mcfly init zsh)"
 fi
 
 if [[ $(command -v pyenv) ]]; then
@@ -71,7 +76,7 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias df='df -H'
 alias ff='fd'
-alias yta="youtube-dl --ignore-errors --yes-playlist --format m4a"
+alias yta="yt-dlp -x --audio-format m4a"
 alias now="date +%Y%m%dT%H%M%S"
 alias reload="source ~/.bashrc" # overridden later if Darwin
 alias timestamp="now"
@@ -87,18 +92,19 @@ alias tips="tldr"
 alias gs='git status'
 alias gc='git commit'
 alias gb='git branch'
+alias ts='/Applications/Tailscale.app/Contents/MacOS/Tailscale'
 
 # --------------------------------- #
 # DARWIN ALIASES
 # --------------------------------- #
 if [[ "${UNAME}" == "Darwin" ]]; then
-  alias reload="source ~/.bash_profile"
+  alias reload="source ~/.zshrc"
   alias plistbuddy='/usr/libexec/PlistBuddy'
   alias ping='ping --apple-time'
 fi
 
 # --------------------------------- #
-# BASH COMPLETIONS
+# COMPLETIONS
 # --------------------------------- #
 which thefuck >/dev/null && source <(thefuck --alias)
 
@@ -127,7 +133,7 @@ export LESS=" -R"
 # FUNCTIONS
 # --------------------------------- #
 aliases() {
-  which code || "${EDITOR}" "${DOTFILES}/customizations.bash" && code "${DOTFILES}/customizations.bash"
+  which code || "${EDITOR}" "${DOTFILES}/customizations.zsh" && code "${DOTFILES}/customizations.zsh"
 }
 
 s3cat() {
