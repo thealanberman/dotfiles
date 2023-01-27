@@ -21,7 +21,7 @@ if [[ $(command -v cargo) ]]; then
 fi
 
 if [[ $(command -v mcfly) ]]; then
-  eval "$(mcfly init bash)"
+  eval "$(mcfly init ${SHELL##/*/})"
 fi
 
 if [[ $(command -v pyenv) ]]; then
@@ -102,7 +102,6 @@ fi
 # BASH COMPLETIONS
 # --------------------------------- #
 which thefuck >/dev/null && source <(thefuck --alias)
-which awless >/dev/null && source <(awless completion bash)
 
 # --------------------------------- #
 # SPEED UP DOCKER BUILDS
