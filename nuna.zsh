@@ -9,7 +9,7 @@ export NUNA_MFA_METHOD=token
 # See: https://www.terraform.io/docs/configuration/providers.html#provider-plugin-cache
 export TF_PLUGIN_CACHE_DIR="${HOME}/.terraform.d/plugin-cache"
 
-alias ws="ssh -A ${HOME}.ws.nuna.cloud"
+alias ws="ssh -A ${USER}.ws.nuna.cloud"
 alias cfrun="docker run cfrun"
 alias ecr-login="aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 254566265011.dkr.ecr.us-west-2.amazonaws.com"
 alias ap="awsprofiles"
