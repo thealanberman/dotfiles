@@ -53,6 +53,7 @@ na() {
 }
 
 daily() {
+  /Applications/Tailscale.app/Contents/MacOS/Tailscale login --shields-up
   nuna_access login -r admin --all-enclaves
   echo "Syncing nuna_access credentials to ${USER}.ws.nuna.cloud"
   scp ${HOME}/.config/nuna/*.json ${USER}.ws.nuna.cloud:/home/${USER}/.config/nuna

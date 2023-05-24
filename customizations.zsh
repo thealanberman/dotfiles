@@ -3,7 +3,7 @@
 # dedupe history, ignore commands with leading space
 export HISTCONTROL=ignoreboth:erasedups
 
-export PATH="/usr/local/sbin:${PATH}"
+export PATH="/opt/homebrew/sbin:/usr/local/sbin:${PATH}"
 
 # pasted URLs are automatically quoted, without needing to disable globbing
 autoload -Uz bracketed-paste-magic
