@@ -2,7 +2,8 @@
 export MFA_STS_DURATION=53200
 export SSH_ENV="${HOME}/.ssh/environment"
 export ADMIN_USERNAME='${USER}-admin'
-export CDPATH=:..:~:${HOME}/code:
+export VAULT_ROOT="${HOME}/code/vault"
+export CDPATH=:..:~:${NUNA_ROOT}/configs/nunahealth/aws/cloudformation:${NUNA_ROOT}/configs/nunahealth:${HOME}/code:
 export NUNA_MFA_METHOD=token
 
 # Terraform shared cache
@@ -53,6 +54,9 @@ na() {
 }
 
 daily() {
+  echo "Flushing DNS cache"
+  sudo dscacheutil -flushcache
+  sudo killall -HUP mDNSResponder
   nuna_access login -r admin --all-enclaves
   echo "Syncing nuna_access credentials to ${USER}.ws.nuna.cloud"
   scp ${HOME}/.config/nuna/*.json ${USER}.ws.nuna.cloud:/home/${USER}/.config/nuna
