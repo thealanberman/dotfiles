@@ -58,6 +58,7 @@ daily() {
   sudo dscacheutil -flushcache
   sudo killall -HUP mDNSResponder
   nuna_access login -r admin --all-enclaves
+  [[ $? != 0 ]] && return
   echo "Syncing nuna_access credentials to ${USER}.ws.nuna.cloud"
   scp ${HOME}/.config/nuna/*.json ${USER}.ws.nuna.cloud:/home/${USER}/.config/nuna
 }
