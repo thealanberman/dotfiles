@@ -132,7 +132,6 @@ Darwin)
   cat <<EOF >>"${HOME}/.bash_profile"
 export HISTCONTROL=ignoreboth:erasedups
 source ${CWD}/customizations.bash
-[[ $USER == "alan" ]] && source ${CWD}/nuna.bash
 export STARSHIP_CONFIG=${CWD}/starship.toml
 eval "$(starship init bash)"
 EOF
@@ -155,7 +154,6 @@ Linux)
   cat <<EOF >>"${HOME}/.bashrc"
 export HISTCONTROL=ignoreboth:erasedups
 source ${CWD}/customizations.bash
-[[ $USER == "alan" ]] && source ${CWD}/nuna.bash
 export STARSHIP_CONFIG=${CWD}/starship.toml
 eval "$(starship init bash)"
 EOF
