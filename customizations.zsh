@@ -5,6 +5,10 @@ export HISTCONTROL=ignoreboth:erasedups
 
 export PATH="/opt/homebrew/sbin:/usr/local/sbin:${PATH}"
 
+# turn on quick 'cd' to common folders
+setopt auto_cd
+cdpath=("${HOME}" "${HOME}/code" "${HOME}/Sync")
+
 # pasted URLs are automatically quoted, without needing to disable globbing
 autoload -Uz bracketed-paste-magic
 zle -N bracketed-paste bracketed-paste-magic
@@ -349,15 +353,17 @@ ramdisk() {
 
 splay() {
   [[ $1 ]] || {
-    echo "Usage: splay <seconds> <command>"
+    echo "delay a command by a random 1 to N seconds"
+    echo "Usage: splay N <command>"
     return 1
   }
-  local seconds=$((RANDOM % ${1}))
+  local seconds=$((RANDOM % $1))
   sleep ${seconds}
   shift
-  eval "${@}"
+  $@
 }
 
+# loop any command. don't use this with ping.
 loop() {
   while true; do
     $@
@@ -381,9 +387,8 @@ a2v() {
 # because dig on macOS behaves differently
 alias dnsquery='dscacheutil -q host -a name'
 dig() {
-  [[ $UNAME == "Darwin" ]] && echo "$(tput bold)macOS detected. Try 'dnsquery' instead.$(tput sgr0)"
+  [[ $UNAME == "Darwin" ]] && echo "$(tput bold)macOS detected. Try 'dnsquery' instead?$(tput sgr0)"
   /usr/bin/dig $@
-  [[ $UNAME == "Darwin" ]] && echo "$(tput bold)macOS detected. Try 'dnsquery' instead.$(tput sgr0)"
 }
 
 fix() {
@@ -394,22 +399,16 @@ fix() {
   echo -e "ICONS:\n\tsudo pkill com.apple.quicklook.ThumbnailsAgent; sudo killall Finder"
 }
 
-heardle() {
-  folder=${HOME}/Desktop/$(date +%Y%m%d)
-  mkdir -p "${folder}"
-  ffmpeg -i "${1}" -ss 00:00:00 -to 00:00:01 -vn -map_metadata -1 ${folder}/01.mp3
-  ffmpeg -i "${1}" -ss 00:00:00 -to 00:00:02 -vn -map_metadata -1 ${folder}/02.mp3
-  ffmpeg -i "${1}" -ss 00:00:00 -to 00:00:04 -vn -map_metadata -1 ${folder}/03.mp3
-  ffmpeg -i "${1}" -ss 00:00:00 -to 00:00:08 -vn -map_metadata -1 ${folder}/04.mp3
-  ffmpeg -i "${1}" -ss 00:00:00 -to 00:00:16 -vn -map_metadata -1 ${folder}/05.mp3
-  shift 1
-  echo "${@}" >"${folder}/answer.txt"
-}
-
 k() {
   [[ -z $1 ]] && {
+    echo "keychain entry lookup + copy to clipboard"
     echo "USAGE: k <unique NAME of keychain entry>"
     return 1
   }
   security find-generic-password -w -l "${1}" | pbcopy && echo "password copied to clipboard"
+}
+
+# mst3k upscale project download params
+ytm() {
+  yt-dlp -N 4 -f 299+140 "${1}"
 }

@@ -28,6 +28,8 @@ make_symlinks() {
   ln -fs "${CWD}/.zshrc" "${HOME}/"
   ln -fs "${CWD}/.p10k.zsh" "${HOME}/"
   ln -fs "${CWD}/prompty" "/usr/local/bin/"
+  ln -fs "${CWD}/.gitconfig" "${HOME}/"
+  ln -fs "${CWD}/.global_gitignore" "${HOME}/"
 }
 
 configure_vim() {

@@ -1,0 +1,7 @@
+[user]
+	email = thealanberman@gmail.com
+	name = Alan Berman
+[init]
+	defaultBranch = main
+[core]
+    excludesfile = ~/.global_gitignore
