@@ -19,5 +19,6 @@
     "statusBarItem.remoteForeground": "#e7e7e7",
     "commandCenter.border": "#e7e7e799"
   },
-  "peacock.color": "#000000"
+  "peacock.color": "#000000",
+  "git-blame.gitWebUrl": ""
 }
