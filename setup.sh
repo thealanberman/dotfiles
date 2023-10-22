@@ -26,6 +26,8 @@ make_symlinks() {
   ln -fs "${CWD}/.tmux.conf" "${HOME}/"
   ln -s "${CWD}/.vimrc" "${HOME}/"
   ln -s "${CWD}/prompty" "/usr/local/bin/"
+  ln -s "${CWD}/gitconfig" "${HOME}/.gitconfig"
+  ln -s "${CWD}/global_gitignore" "${HOME}/.global_gitignore"
 }
 
 configure_vim() {
@@ -70,7 +72,6 @@ install_brew_apps() {
       ripgrep \
       ruby \
       shellcheck \
-      starship \
       tfenv \
       tldr \
       tmux \
@@ -115,10 +116,6 @@ install_linux_apps() {
     curl -sL "https://github.com/BurntSushi/ripgrep/releases/download/${version}/ripgrep_${version}_amd64.deb" -o /tmp/rg.deb
     sudo dpkg -i /tmp/rg.deb
   }
-
-  which starship || {
-    sh -c "$(curl -fsSL https://starship.rs/install.sh)"
-  }
 }
 
 case $(uname) in
@@ -132,8 +129,6 @@ Darwin)
   cat <<EOF >>"${HOME}/.bash_profile"
 export HISTCONTROL=ignoreboth:erasedups
 source ${CWD}/customizations.bash
-export STARSHIP_CONFIG=${CWD}/starship.toml
-eval "$(starship init bash)"
 EOF
   echo "REMEMBER: source ~/.bash_profile"
   ;;
@@ -154,8 +149,6 @@ Linux)
   cat <<EOF >>"${HOME}/.bashrc"
 export HISTCONTROL=ignoreboth:erasedups
 source ${CWD}/customizations.bash
-export STARSHIP_CONFIG=${CWD}/starship.toml
-eval "$(starship init bash)"
 EOF
   echo "REMEMBER: source ~/.bashrc"
   ;;
