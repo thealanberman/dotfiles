@@ -97,7 +97,8 @@ alias gs='git status'
 alias gc='git commit'
 alias gb='git branch'
 alias ts='/Applications/Tailscale.app/Contents/MacOS/Tailscale'
-
+alias pm='/opt/homebrew/bin/podman'
+  
 # --------------------------------- #
 # DARWIN ALIASES
 # --------------------------------- #
