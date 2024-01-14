@@ -324,14 +324,37 @@ subtitle_extract() {
     echo "Usage: subtitle_extract <video file>"
     return 1
   }
-  fmt=$(ffprobe "${1}" 2>&1 | sed -En 's/.*Subtitle: (...).*/\1/p')
+  info=$(ffprobe -v error -select_streams s -show_entries stream=index,codec_name,stream_tags=language,format_tags=format -of csv=p=0 "${1}" | grep -Ei 'subrip|ssa|ass')
+  fmt=$(echo "${info}" | awk -F',' '{print $2}')
+  stream=$(echo "${info}" | awk -F',' '{print $1}')
 
-  if [[ "${fmt}" == "subrip" ]]; then
-    ffmpeg -i "${1}" -map 0:s:0 "${1%.*}.srt"
+  case "${fmt}" in
+  subrip)
+    ffmpeg -i "${1}" -map 0:${stream} -c:s srt "${1%.*}.srt"
     echo "Output: ${1%.*}.srt"
-  else
+    ;;
+  ssa|ass)
+    ffmpeg -i "${1}" -map 0:${stream} -c:s srt "${1%.*}.srt"
+    echo "Output: ${1%.*}.ass"
+    ;;
+  *)
     echo "not sure what extension to use for ${fmt}"
+    ;;
+  esac
+}
+
+subtitle_merge() {
+  [[ ${1} ]] || {
+    echo "Usage: subtitle_merge <video file> <subtitle file>"
+    return 1
+  }
+  if [[ "${1##*.}" == "mp4" ]]; then
+    ffmpeg -i "${1}" -i "${2}" -c copy -c:s mov_text "${1%.*}_merged.${1##*.}"
   fi
+  if [[ "${1##*.}" == "mkv" ]]; then
+    mkvmerge "${1}" -o "${1%.*}_merged.${1##*.}" --language 0:eng "${2}"
+  fi
+  echo "Output: ${1%.*}_merged.${1##*.}"
 }
 
 hashafter() {
