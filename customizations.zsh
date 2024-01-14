@@ -436,3 +436,11 @@ k() {
 ytm() {
   yt-dlp -N 4 -f 299+140 "${1}"
 }
+
+venv() {
+  if [[ ! -d venv ]]; then
+    python -m venv venv
+  fi
+  source venv/bin/activate
+  which python
+}
