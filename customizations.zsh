@@ -3,11 +3,14 @@
 # dedupe history, ignore commands with leading space
 export HISTCONTROL=ignoreboth:erasedups
 
-export PATH="/opt/homebrew/sbin:/usr/local/sbin:${PATH}"
+export PATH="/opt/homebrew/sbin:/usr/local/sbin::${HOME}/.local/bin:${PATH}"
 
 # turn on quick 'cd' to common folders
 setopt auto_cd
 cdpath=("${HOME}" "${HOME}/code" "${HOME}/Sync")
+
+# initialize zoxide
+eval "$(zoxide init zsh)"
 
 # pasted URLs are automatically quoted, without needing to disable globbing
 autoload -Uz bracketed-paste-magic
@@ -28,18 +31,6 @@ if [[ $(command -v cargo) ]]; then
   export PATH="${HOME}/.cargo/bin:${PATH}"
 fi
 
-if [[ $(command -v mcfly) ]]; then
-  HISTFILE=${HOME}/.zsh_history
-  eval "$(mcfly init zsh)"
-fi
-
-if [[ $(command -v pyenv) ]]; then
-  export PYENV_ROOT="$HOME/.pyenv"
-  export PATH="$PYENV_ROOT/bin:$PATH"
-  eval "$(pyenv init --path)"
-  eval "$(pyenv init -)"
-fi
-
 # Enable asdf -- https://github.com/asdf-vm/asdf
 [[ -f /usr/local/opt/asdf/libexec/asdf.sh ]] && source /usr/local/opt/asdf/libexec/asdf.sh
 
@@ -51,7 +42,7 @@ export DOTFILES="${HOME}/code/dotfiles"
 # --------------------------------- #
 # EDITOR
 # --------------------------------- #
-export EDITOR="vim"
+export EDITOR="code"
 
 # --------------------------------- #
 # PAGER
@@ -80,7 +71,8 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias df='df -H'
 alias ff='fd'
-alias yta="yt-dlp -x --audio-format m4a"
+alias yta="yt-dlp -t m4a"
+alias ytv="yt-dlp -t mp4"
 alias now="date +%Y%m%dT%H%M%S"
 alias reload="source ~/.bashrc" # overridden later if Darwin
 alias timestamp="now"
@@ -98,7 +90,9 @@ alias gc='git commit'
 alias gb='git branch'
 alias ts='/Applications/Tailscale.app/Contents/MacOS/Tailscale'
 alias pm='/opt/homebrew/bin/podman'
-  
+
+
+
 # --------------------------------- #
 # DARWIN ALIASES
 # --------------------------------- #
@@ -307,6 +301,14 @@ audio_extract() {
   echo "Output: ${1%.*}.${audioFormat[${fmt}]}"
 }
 
+audio_remove() {
+  [[ ${1} ]] || {
+    echo "Usage: audio_remove <video file>"
+    return 1
+  }
+  ffmpeg -i "${1}" -c:v copy -map 0:v "${1%.*}_noaudio.${1##*.}"
+}
+
 audio_chunk() {
   if [[ -z ${1} ]] || [[ -z ${2} ]]; then
     echo "Usage: audio_chunk <audio file> <number of chunks>"
@@ -443,4 +445,33 @@ venv() {
   fi
   source venv/bin/activate
   which python
+}
+
+alias video_trim="audio_trim"
+
+flushdns() {
+  sudo dscacheutil -flushcache
+  sudo killall -HUP mDNSResponder
+}
+
+capture_livestream() {
+    if [ -z "$1" ]; then
+        echo "Usage: capture_livestream <STREAM_URL>"
+        return 1
+    fi
+
+    local STREAM_URL="$1"
+    local OUTPUT_FORMAT="%(title)s (%(id)s) %(upload_date)s.%(ext)s"
+
+    echo "Attempting to capture live stream: ${STREAM_URL}"
+    echo "Output filename format: ${OUTPUT_FORMAT}"
+    echo "Press Ctrl+C to stop the capture."
+    echo "--------------------------------------------------"
+
+    yt-dlp \
+        --fragment-retries infinite \
+        --retries infinite \
+        --socket-timeout 10 \
+        -o "${OUTPUT_FORMAT}" \
+        "${STREAM_URL}"
 }
