@@ -5,3 +5,6 @@
 	defaultBranch = main
 [core]
     excludesfile = ~/.global_gitignore
+[identity "thealanberman_at_gmail_dot_com"]
+	name = Alan Berman
+	email = thealanberman@gmail.com
