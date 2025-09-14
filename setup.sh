@@ -25,7 +25,6 @@ make_symlinks() {
   ln -fs "${CWD}/.inputrc" "${HOME}/"
   ln -fs "${CWD}/.tmux.conf" "${HOME}/"
   ln -s "${CWD}/.vimrc" "${HOME}/"
-  ln -s "${CWD}/prompty" "/usr/local/bin/"
   ln -s "${CWD}/gitconfig" "${HOME}/.gitconfig"
   ln -s "${CWD}/global_gitignore" "${HOME}/.global_gitignore"
 }
@@ -49,38 +48,22 @@ install_brew_apps() {
   read -e -s -p "Install Homebrew apps [y/N]? " -n 1 -r
   if [[ "${REPLY}" =~ ^[Yy]$ ]]; then
     brew install \
-      bat \
-      dc3dd \
+      dust \
       git-delta \
       fd \
       ffmpeg \
       git \
-      golang \
       grep \
       highlight \
-      lazydocker \
       jq \
-      mcfly \
-      mtr \
-      openssh \
-      openssl \
-      pipx \
-      pipenv \
-      psgrep \
-      pv \
-      python \
       ripgrep \
-      ruby \
-      shellcheck \
-      tfenv \
       tldr \
-      tmux \
-      tree \
+      uv \
       vim \
       wget \
-      youtube-dl \
-      yq
+      youtube-dl
   fi
+  echo "You also probably want to run: brew bundle install"
 }
 
 get_latest_version() {
